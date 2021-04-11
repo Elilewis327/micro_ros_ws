@@ -8,6 +8,8 @@
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 
+#include "error.cpp"
+
 #include <std_msgs/msg/int32.h>
 
 rcl_subscription_t subscriber;
@@ -17,19 +19,6 @@ rclc_support_t support;
 rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t timer;
-
-#define LED_PIN 13
-
-#define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
-#define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
-
-
-void error_loop(){
-  while(1){
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    delay(100);
-  }
-}
 
 void subscription_callback(const void * msgin)
 {  
