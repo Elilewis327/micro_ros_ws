@@ -23,7 +23,7 @@ extern "C"
 // Member 'time_ref'
 #include "builtin_interfaces/msg/detail/time__struct.h"
 // Member 'source'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/TimeReference in the package sensor_msgs.
 typedef struct sensor_msgs__msg__TimeReference

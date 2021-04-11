@@ -45,7 +45,7 @@ enum
 // Member 'name'
 // Member 'message'
 // Member 'hardware_id'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'values'
 #include "diagnostic_msgs/msg/detail/key_value__struct.h"
 

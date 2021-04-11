@@ -61,7 +61,7 @@ enum
 
 // Include directives for member types
 // Member 'error_string'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/TF2Error in the package tf2_msgs.
 typedef struct tf2_msgs__msg__TF2Error

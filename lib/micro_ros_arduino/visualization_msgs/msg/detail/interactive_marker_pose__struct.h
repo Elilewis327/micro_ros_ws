@@ -23,7 +23,7 @@ extern "C"
 // Member 'pose'
 #include "geometry_msgs/msg/detail/pose__struct.h"
 // Member 'name'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/InteractiveMarkerPose in the package visualization_msgs.
 typedef struct visualization_msgs__msg__InteractiveMarkerPose

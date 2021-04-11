@@ -20,7 +20,7 @@ extern "C"
 // Include directives for member types
 // Member 'string_values'
 // Member 'string_values_default'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'basic_types_values'
 #include "test_msgs/msg/detail/basic_types__struct.h"
 // Member 'constants_values'

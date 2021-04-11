@@ -20,7 +20,7 @@ extern "C"
 // Include directives for member types
 // Member 'names'
 // Member 'prefixes'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/ListParametersResult in the package rcl_interfaces.
 typedef struct rcl_interfaces__msg__ListParametersResult

@@ -33,7 +33,7 @@ static const char * const test_msgs__msg__Strings__STRING_CONST = "Hello world!"
 // Member 'bounded_string_value_default3'
 // Member 'bounded_string_value_default4'
 // Member 'bounded_string_value_default5'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // constants for array fields with an upper bound
 // bounded_string_value

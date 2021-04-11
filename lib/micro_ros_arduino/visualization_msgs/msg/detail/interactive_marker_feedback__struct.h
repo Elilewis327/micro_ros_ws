@@ -59,7 +59,7 @@ enum
 // Member 'client_id'
 // Member 'marker_name'
 // Member 'control_name'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'pose'
 #include "geometry_msgs/msg/detail/pose__struct.h"
 // Member 'mouse_point'

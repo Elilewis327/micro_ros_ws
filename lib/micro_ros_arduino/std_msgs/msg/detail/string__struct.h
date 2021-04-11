@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'data'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/String in the package std_msgs.
 typedef struct std_msgs__msg__String

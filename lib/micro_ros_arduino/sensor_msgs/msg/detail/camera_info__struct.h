@@ -21,7 +21,7 @@ extern "C"
 // Member 'header'
 #include "std_msgs/msg/detail/header__struct.h"
 // Member 'distortion_model'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'd'
 #include "rosidl_runtime_c/primitives_sequence.h"
 // Member 'roi'

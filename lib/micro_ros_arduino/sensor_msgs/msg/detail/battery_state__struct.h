@@ -151,7 +151,7 @@ enum
 #include "rosidl_runtime_c/primitives_sequence.h"
 // Member 'location'
 // Member 'serial_number'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/BatteryState in the package sensor_msgs.
 typedef struct sensor_msgs__msg__BatteryState

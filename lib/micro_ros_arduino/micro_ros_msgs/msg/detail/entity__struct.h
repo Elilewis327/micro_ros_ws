@@ -44,7 +44,7 @@ enum
 // Include directives for member types
 // Member 'name'
 // Member 'types'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // constants for array fields with an upper bound
 // name
