@@ -169,7 +169,7 @@ class mpu6050_node {
 
     };
 
-    void update(sensor_msgs__msg__Imu& imu_msg, int64_t last_time) {
+    void update(sensor_msgs__msg__Imu& imu_msg) {
         if (!dmpReady) return;
 
         fifoCount = mpu.getFIFOCount();

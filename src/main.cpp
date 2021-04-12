@@ -48,7 +48,7 @@ void imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
     RCLC_UNUSED(last_call_time);
     if (timer != NULL) {
         RCSOFTCHECK(rcl_publish(&imu_pub, &imu_msg, NULL));
-        imu.update(imu_msg, last_call_time);
+        imu.update(imu_msg);
     }
 }
 
