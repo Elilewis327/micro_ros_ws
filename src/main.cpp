@@ -38,6 +38,7 @@ rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t timer;
 
+// I/O
 mpu6050_node imu;
 
 const unsigned int timer_timeout = 1000;
