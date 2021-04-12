@@ -38,6 +38,8 @@ rcl_allocator_t allocator;
 rcl_node_t node;
 rcl_timer_t timer;
 
+mpu6050_node imu;
+
 const unsigned int timer_timeout = 1000;
 
 // Callbacks
@@ -45,7 +47,7 @@ void imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
     RCLC_UNUSED(last_call_time);
     if (timer != NULL) {
         RCSOFTCHECK(rcl_publish(&imu_pub, &imu_msg, NULL));
-        //msg.
+        imu.update(imu_msg, last_call_time);
     }
 }
 
