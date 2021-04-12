@@ -96,9 +96,8 @@ class mpu6050_node {
             Fastwire::setup(400, true);
         #endif
 
-        Serial.begin(115200);
+        
         mpu.initialize();
-        pinMode(INTERRUPT_PIN, INPUT);
         // NOISE PERFORMANCE: Power Spectral Density @10Hz, AFS_SEL=0 & ODR=1kHz 400 ug/√Hz (probably wrong)
         linear_acceleration_stdev_ = (400 / 1000000.0) * 9.807;
         
@@ -132,29 +131,29 @@ class mpu6050_node {
         devStatus = mpu.dmpInitialize();
 
         // Set accel offsets.
-        printf("Setting X accel offset: \n");
+        Serial.println("Setting X accel offset: \n");
         mpu.setXAccelOffset(ax);
-        printf("Setting Y accel offset: \n");
+        Serial.println("Setting Y accel offset: \n");
         mpu.setYAccelOffset(ay);
-        printf("Setting Z accel offset: \n");
+        Serial.println("Setting Z accel offset: \n");
         mpu.setZAccelOffset(az);
 
         // Set gyro offsets.
-        printf("Setting X gyro offset: \n");
+        Serial.println("Setting X gyro offset: \n");
         mpu.setXGyroOffset(gx);
-        printf("Setting Y gyro offset: \n");
+        Serial.println("Setting Y gyro offset: \n");
         mpu.setYGyroOffset(gy);
-        printf("Setting Z gyro offset: \n");
+        Serial.println("Setting Z gyro offset: \n");
         mpu.setZGyroOffset(gz);
 
         // make sure it worked (returns 0 if so)
         if (devStatus == 0) {
             // turn on the DMP, now that it's ready
-            printf("Enabling DMP...\n");
+            Serial.println("Enabling DMP...\n");
             mpu.setDMPEnabled(true);
 
             // set our DMP Ready flag so the main loop() function knows it's okay to use it
-            printf("DMP ready!\n");
+            Serial.println("DMP ready!\n");
             dmpReady = true;
 
             // get expected DMP packet size for later comparison
@@ -164,7 +163,7 @@ class mpu6050_node {
             // 1 = initial memory load failed
             // 2 = DMP configuration updates failed
             // (if it's going to break, usually the code will be 1)
-            printf("DMP Initialization failed (code %d)\n", devStatus);
+            Serial.println("DMP Initialization failed (code %d)\n");
         }
 
     };
@@ -177,7 +176,7 @@ class mpu6050_node {
         if (fifoCount == 1024) {
             // reset so we can continue cleanly
             mpu.resetFIFO();
-            if(debug) printf("FIFO overflow!\n");
+            if(debug) Serial.println("FIFO overflow!\n");
 
         // otherwise, check for DMP data ready interrupt (this should happen frequently)
         } else if (fifoCount >= 42) {
@@ -235,7 +234,7 @@ class mpu6050_node {
 
             #endif
 
-            if(debug) printf("\n");
+            if(debug) Serial.println("\n");
         }
     }
 };

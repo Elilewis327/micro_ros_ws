@@ -39,7 +39,7 @@ rcl_node_t node;
 rcl_timer_t timer;
 
 // I/O
-mpu6050_node imu;
+// mpu6050_node imu;
 
 const unsigned int timer_timeout = 1000;
 
@@ -48,7 +48,8 @@ void imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
     RCLC_UNUSED(last_call_time);
     if (timer != NULL) {
         RCSOFTCHECK(rcl_publish(&imu_pub, &imu_msg, NULL));
-        imu.update(imu_msg);
+        // imu.update(imu_msg);
+        
     }
 }
 
@@ -58,22 +59,23 @@ void drive_sub_callback(const void * msgin)
 }
 
 void setup() {
+  Serial.begin(115200);
   set_microros_transports();
   
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);  
   
   delay(2000);
-
+  Serial.println("Initializing default allocator");
   allocator = rcl_get_default_allocator();
 
-  //create init_options
+  // create init_options
+  Serial.println("Initializing default support init");
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 
   // create node
+  Serial.println("Initializing creating teensy node");
   RCCHECK(rclc_node_init_default(&node, "teensy_node", "", &support));
-
-  
 
   // create publisher
   RCCHECK(rclc_publisher_init_default(
@@ -84,6 +86,7 @@ void setup() {
   ));
 
   // create subscriber
+  Serial.println("Initializing Tank Subscriber");
   RCCHECK(rclc_subscription_init_default(
     &drive_sub,
     &node,
@@ -91,6 +94,7 @@ void setup() {
     "tank_sub"));
 
   // Create timer,
+  Serial.println("Initializing timer");
   RCCHECK(rclc_timer_init_default(
       &timer,
       &support,
@@ -99,6 +103,7 @@ void setup() {
   ));
 
   // create executor
+  Serial.println("Initializing executor");
   RCCHECK(rclc_executor_init(&executor, &support.context, 1, &allocator));
   RCCHECK(rclc_executor_add_subscription(&executor, &drive_sub, &drive_msg, &drive_sub_callback, ON_NEW_DATA));
   RCCHECK(rclc_executor_add_timer(&executor, &timer));
@@ -107,6 +112,8 @@ void setup() {
 
 
 void loop() {
-  delay(100);
+  delay(500);
   RCCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
+  digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+
 }
