@@ -17,14 +17,9 @@ extern "C"
 
 // Constants defined in the message
 
-// Include directives for member types
-// Member 'header'
-#include "std_msgs/msg/detail/header__struct.h"
-
 // Struct defined in msg/Swerve in the package drive_controller_msgs.
 typedef struct drive_controller_msgs__msg__Swerve
 {
-  std_msgs__msg__Header header;
   float ws[4];
   float wa[4];
 } drive_controller_msgs__msg__Swerve;

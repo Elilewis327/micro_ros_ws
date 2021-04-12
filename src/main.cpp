@@ -1,12 +1,14 @@
 #include <micro_ros_arduino.h>
 
-//#include <Arduino.h>
+#include <Arduino.h>
 
 #include <stdio.h>
 #include <rcl/rcl.h>
 #include <rcl/error_handling.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
+
+#include "mpu6050_node.h"
 
 #include <drive_controller_msgs/msg/tank.h>
 #include <drive_controller_msgs/msg/swerve.h>
@@ -20,8 +22,8 @@
 
 void error_loop(){
   while(1){
-    // digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    // delay(100);
+    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    delay(100);
   }
 }
 
@@ -55,10 +57,10 @@ void drive_sub_callback(const void * msgin)
 void setup() {
   set_microros_transports();
   
-  // pinMode(LED_PIN, OUTPUT);
-  // digitalWrite(LED_PIN, HIGH);  
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH);  
   
-  // delay(2000);
+  delay(2000);
 
   allocator = rcl_get_default_allocator();
 
@@ -68,12 +70,7 @@ void setup() {
   // create node
   RCCHECK(rclc_node_init_default(&node, "teensy_node", "", &support));
 
-  // create subscriber
-  RCCHECK(rclc_subscription_init_default(
-    &drive_sub,
-    &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(drive_controller_msgs, msg, Tank),
-    "tank_sub"));
+  
 
   // create publisher
   RCCHECK(rclc_publisher_init_default(
@@ -82,6 +79,13 @@ void setup() {
       ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Imu),
       "mpu6050_pub"
   ));
+
+  // create subscriber
+  RCCHECK(rclc_subscription_init_default(
+    &drive_sub,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(drive_controller_msgs, msg, Tank),
+    "tank_sub"));
 
   // Create timer,
   RCCHECK(rclc_timer_init_default(
@@ -97,7 +101,9 @@ void setup() {
   RCCHECK(rclc_executor_add_timer(&executor, &timer));
 }
 
+
+
 void loop() {
-  //delay(100);
+  delay(100);
   RCCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
 }
