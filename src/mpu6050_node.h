@@ -75,7 +75,7 @@ class mpu6050_node {
 
     int ax, ay, az, gx, gy, gz;
 
-    bool debug = false;
+    bool debug = true;
 
     double angular_velocity_covariance, pitch_roll_covariance, yaw_covariance, linear_acceleration_covariance;
     double linear_acceleration_stdev_, angular_velocity_stdev_, yaw_stdev_, pitch_roll_stdev_;
@@ -117,43 +117,37 @@ class mpu6050_node {
 
 
         // verify connection
-        Serial.println(F("Testing device connections..."));
-        Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
-
-        // wait for ready
-        Serial.println(F("\nSend any character to begin DMP programming and demo: "));
-        while (Serial.available() && Serial.read()); // empty buffer
-        while (!Serial.available());                 // wait for data
-        while (Serial.available() && Serial.read()); // empty buffer again
+        printf("Testing device connections...");
+        printf(mpu.testConnection() ? "MPU6050 connection successful\n" : "MPU6050 connection failed\n");
 
         // load and configure the DMP
-        Serial.println(F("Initializing DMP..."));
+        printf("Initializing DMP...\n");
         devStatus = mpu.dmpInitialize();
 
         // Set accel offsets.
-        Serial.println("Setting X accel offset: \n");
+        printf("Setting X accel offset: \n");
         mpu.setXAccelOffset(ax);
-        Serial.println("Setting Y accel offset: \n");
+        printf("Setting Y accel offset: \n");
         mpu.setYAccelOffset(ay);
-        Serial.println("Setting Z accel offset: \n");
+        printf("Setting Z accel offset: \n");
         mpu.setZAccelOffset(az);
 
         // Set gyro offsets.
-        Serial.println("Setting X gyro offset: \n");
+        printf("Setting X gyro offset: \n");
         mpu.setXGyroOffset(gx);
-        Serial.println("Setting Y gyro offset: \n");
+        printf("Setting Y gyro offset: \n");
         mpu.setYGyroOffset(gy);
-        Serial.println("Setting Z gyro offset: \n");
+        printf("Setting Z gyro offset: \n");
         mpu.setZGyroOffset(gz);
 
         // make sure it worked (returns 0 if so)
         if (devStatus == 0) {
             // turn on the DMP, now that it's ready
-            Serial.println("Enabling DMP...\n");
+            printf("Enabling DMP...\n");
             mpu.setDMPEnabled(true);
 
             // set our DMP Ready flag so the main loop() function knows it's okay to use it
-            Serial.println("DMP ready!\n");
+            printf("DMP ready!\n");
             dmpReady = true;
 
             // get expected DMP packet size for later comparison
@@ -163,7 +157,7 @@ class mpu6050_node {
             // 1 = initial memory load failed
             // 2 = DMP configuration updates failed
             // (if it's going to break, usually the code will be 1)
-            Serial.println("DMP Initialization failed (code %d)\n");
+            printf("DMP Initialization failed (code %d)\n", devStatus);
         }
 
     };
@@ -176,7 +170,7 @@ class mpu6050_node {
         if (fifoCount == 1024) {
             // reset so we can continue cleanly
             mpu.resetFIFO();
-            if(debug) Serial.println("FIFO overflow!\n");
+            if(debug) printf("FIFO overflow!\n");
 
         // otherwise, check for DMP data ready interrupt (this should happen frequently)
         } else if (fifoCount >= 42) {
@@ -234,7 +228,7 @@ class mpu6050_node {
 
             #endif
 
-            if(debug) Serial.println("\n");
+            if(debug) printf("update");
         }
     }
 };
