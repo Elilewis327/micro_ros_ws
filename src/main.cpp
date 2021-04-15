@@ -68,6 +68,7 @@ void setup() {
   
   delay(2000);
   allocator = rcl_get_default_allocator();
+  digitalWrite(LED_PIN, LOW);
 
   // create init_options
   printf("Initializing default support init");
@@ -109,12 +110,16 @@ void setup() {
   RCCHECK(rclc_executor_add_timer(&executor, &timer));
 }
 
+void loop() {
+  delay(500);
+  RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
+
+}
+
 int main(int argc, char *argv[])
 {
   setup();
-  RCCHECK(rclc_executor_spin_period(&executor, RCL_MS_TO_NS(20)));
-
-  RCCHECK(rcl_subscription_fini(&drive_sub, &node));
-	RCCHECK(rcl_publisher_fini(&imu_pub, &node));
-	RCCHECK(rcl_node_fini(&node));
+  while (1) {
+    loop();
+  }
 }
