@@ -48,11 +48,15 @@ void imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
     RCLC_UNUSED(last_call_time);
     if (timer != NULL) {
         RCSOFTCHECK(rcl_publish(&imu_pub, &imu_msg, NULL));
-        imu.update(imu_msg);
-        printf("update imu");
+        
+        // Testing simple message updating
+        imu_msg.angular_velocity.x++;
+        imu_msg.linear_acceleration.x++;
+        imu_msg.orientation.w++;
+        
+        //imu.update(imu_msg);
         digitalWrite(LED_PIN, !digitalRead(LED_PIN));
     }
-    printf("update callback\n");
 }
 
 void drive_sub_callback(const void * msgin)
@@ -61,12 +65,14 @@ void drive_sub_callback(const void * msgin)
 }
 
 void setup() {
+  Serial.begin(115200);
   set_microros_transports();
   
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);  
   
   delay(2000);
+  Serial.println("Initializeing allocator");
   allocator = rcl_get_default_allocator();
   digitalWrite(LED_PIN, LOW);
 
