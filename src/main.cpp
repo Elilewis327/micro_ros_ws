@@ -1,6 +1,13 @@
 #include <micro_ros_arduino.h>
 
 #include <Arduino.h>
+#if __STDC_VERSION__ >= 199901L
+#define _XOPEN_SOURCE 600
+#else
+#define _XOPEN_SOURCE 500
+#endif /* __STDC_VERSION__ */
+#include <ctime>
+#include <sys/_timespec.h>
 
 #include <stdio.h>
 #include <rcl/rcl.h>
@@ -43,11 +50,19 @@ mpu6050_node imu;
 
 const unsigned int timer_timeout = 1000;
 
+extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
+
 // Callbacks
 void imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
     RCLC_UNUSED(last_call_time);
     if (timer != NULL) {
         RCSOFTCHECK(rcl_publish(&imu_pub, &imu_msg, NULL));
+
+        // TODO: Check if timespec returns from program start?
+        struct timespec tv = {0};
+        clock_gettime(0, &tv);
+        imu_msg.header.stamp.nanosec = tv.tv_nsec;
+        imu_msg.header.stamp.sec = tv.tv_sec;
         
         // Testing simple message updating
         imu_msg.angular_velocity.x++;
@@ -114,12 +129,18 @@ void setup() {
   RCCHECK(rclc_executor_init(&executor, &support.context, 2, &allocator)); // handles equal to number of topics/subscriptions
   RCCHECK(rclc_executor_add_subscription(&executor, &drive_sub, &drive_msg, &drive_sub_callback, ON_NEW_DATA));
   RCCHECK(rclc_executor_add_timer(&executor, &timer));
+
+  // set imu_msg header
+  imu_msg.header.frame_id.data = (char*)malloc(100*sizeof(char));
+  char frame[] = "/IMU";
+  memcpy(imu_msg.header.frame_id.data, frame, strlen(frame) + 1);
+  imu_msg.header.frame_id.size = strlen(imu_msg.header.frame_id.data);
+  imu_msg.header.frame_id.capacity = 100;
 }
 
 void loop() {
   delay(500);
   RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
-
 }
 
 int main(int argc, char *argv[])

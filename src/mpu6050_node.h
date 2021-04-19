@@ -45,8 +45,6 @@
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
 //#define OUTPUT_TEAPOT
-
-#define INTERRUPT_PIN 2  // use pin 2 on Arduino Uno & most boards
 class mpu6050_node {
 
     bool ado = false;
@@ -55,20 +53,14 @@ class mpu6050_node {
     MPU6050 mpu;
 
     bool dmpReady = false;  // set true if DMP init was successful
-    uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
-    uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
     uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
-    uint16_t fifoCount;     // count of all bytes currently in FIFO
-    uint8_t fifoBuffer[64]; // FIFO storage buffer
-
-    
+   
     // orientation/motion vars
     Quaternion q;           // [w, x, y, z]         quaternion container
     VectorInt16 aa;         // [x, y, z]            accel sensor measurements
     VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
     VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
     VectorFloat gravity;    // [x, y, z]            gravity vector
-    float euler[3];         // [psi, theta, phi]    Euler angle container
     float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
     int sample_rate = 1000 / timer_delay;
@@ -86,7 +78,7 @@ class mpu6050_node {
     }
 
   public:
-    mpu6050_node(): ax(0), ay(0), az(0), gx(0), gy(0), gz(0) {
+    mpu6050_node(): ax(1), ay(1), az(1), gx(1), gy(1), gz(1) {
 
         // join I2C bus (I2Cdev library doesn't do this automatically)
         #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -115,14 +107,13 @@ class mpu6050_node {
         pitch_roll_covariance = pitch_roll_stdev_ * pitch_roll_stdev_;
         yaw_covariance = yaw_stdev_ * yaw_stdev_;
 
-
         // verify connection
         printf("Testing device connections...");
         printf(mpu.testConnection() ? "MPU6050 connection successful\n" : "MPU6050 connection failed\n");
 
         // load and configure the DMP
         printf("Initializing DMP...\n");
-        devStatus = mpu.dmpInitialize();
+        uint8_t devStatus = mpu.dmpInitialize();
 
         // Set accel offsets.
         printf("Setting X accel offset: \n");
@@ -165,7 +156,7 @@ class mpu6050_node {
     void update(sensor_msgs__msg__Imu& imu_msg) {
         if (!dmpReady) return;
 
-        fifoCount = mpu.getFIFOCount();
+        uint16_t fifoCount = mpu.getFIFOCount();
 
         if (fifoCount == 1024) {
             // reset so we can continue cleanly
@@ -176,6 +167,7 @@ class mpu6050_node {
         } else if (fifoCount >= 42) {
 
             // read a packet from FIFO
+            uint8_t fifoBuffer[64]; // FIFO storage buffer
             mpu.getFIFOBytes(fifoBuffer, packetSize);
             mpu.dmpGetQuaternion(&q, fifoBuffer);
 
