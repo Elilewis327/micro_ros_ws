@@ -48,12 +48,11 @@
 class mpu6050_node {
 
     bool ado = false;
-    const unsigned int timer_delay = 20;
 
     MPU6050 mpu;
 
     bool dmpReady = false;  // set true if DMP init was successful
-    uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
+    uint8_t fifoBuffer[64]; // FIFO storage buffer
    
     // orientation/motion vars
     Quaternion q;           // [w, x, y, z]         quaternion container
@@ -63,23 +62,15 @@ class mpu6050_node {
     VectorFloat gravity;    // [x, y, z]            gravity vector
     float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
-    int sample_rate = 1000 / timer_delay;
-
     int ax, ay, az, gx, gy, gz;
 
-    bool debug = true;
+    bool debug = false;
 
     double angular_velocity_covariance, pitch_roll_covariance, yaw_covariance, linear_acceleration_covariance;
     double linear_acceleration_stdev_, angular_velocity_stdev_, yaw_stdev_, pitch_roll_stdev_;
 
-    volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
-    void dmpDataReady() {
-        mpuInterrupt = true;
-    }
-
   public:
-    mpu6050_node(): ax(1), ay(1), az(1), gx(1), gy(1), gz(1) {
-
+    mpu6050_node(): ax(0), ay(0), az(1788), gx(220), gy(76), gz(-85) {
         // join I2C bus (I2Cdev library doesn't do this automatically)
         #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
             Wire.begin();
@@ -107,48 +98,56 @@ class mpu6050_node {
         pitch_roll_covariance = pitch_roll_stdev_ * pitch_roll_stdev_;
         yaw_covariance = yaw_stdev_ * yaw_stdev_;
 
-        // verify connection
-        printf("Testing device connections...");
-        printf(mpu.testConnection() ? "MPU6050 connection successful\n" : "MPU6050 connection failed\n");
+        // verify connection - usually fails, but still receives data back
+        Serial.println("Testing device connections...");
+        Serial.print(mpu.testConnection() ? "MPU6050 connection successful\n" : "MPU6050 connection failed\n");
 
         // load and configure the DMP
-        printf("Initializing DMP...\n");
+        Serial.print("Initializing DMP...\n");
         uint8_t devStatus = mpu.dmpInitialize();
 
         // Set accel offsets.
-        printf("Setting X accel offset: \n");
+        Serial.print("Setting X accel offset: ");
+        Serial.println(ax);
         mpu.setXAccelOffset(ax);
-        printf("Setting Y accel offset: \n");
+        Serial.print("Setting Y accel offset: ");
+        Serial.println(ay);
         mpu.setYAccelOffset(ay);
-        printf("Setting Z accel offset: \n");
+        Serial.print("Setting Z accel offset: ");
+        Serial.println(az);
         mpu.setZAccelOffset(az);
 
         // Set gyro offsets.
-        printf("Setting X gyro offset: \n");
+        Serial.print("Setting X gyro offset: ");
+        Serial.println(gx);
         mpu.setXGyroOffset(gx);
-        printf("Setting Y gyro offset: \n");
+        Serial.print("Setting Y gyro offset: ");
+        Serial.println(gy);
         mpu.setYGyroOffset(gy);
-        printf("Setting Z gyro offset: \n");
+        Serial.print("Setting Z gyro offset: ");
+        Serial.println(gz);
         mpu.setZGyroOffset(gz);
 
         // make sure it worked (returns 0 if so)
         if (devStatus == 0) {
+            // Calibration Time: generate offsets and calibrate our MPU6050
+            // mpu.CalibrateAccel(6);
+            // mpu.CalibrateGyro(6);
+            // mpu.PrintActiveOffsets();
             // turn on the DMP, now that it's ready
-            printf("Enabling DMP...\n");
+            Serial.print("Enabling DMP...\n");
             mpu.setDMPEnabled(true);
 
             // set our DMP Ready flag so the main loop() function knows it's okay to use it
-            printf("DMP ready!\n");
+            Serial.print("DMP ready!\n");
             dmpReady = true;
-
-            // get expected DMP packet size for later comparison
-            packetSize = mpu.dmpGetFIFOPacketSize();
         } else {
             // ERROR!
             // 1 = initial memory load failed
             // 2 = DMP configuration updates failed
             // (if it's going to break, usually the code will be 1)
-            printf("DMP Initialization failed (code %d)\n", devStatus);
+            Serial.print("DMP Initialization failed: ");
+            Serial.println(devStatus);
         }
 
     };
@@ -156,20 +155,15 @@ class mpu6050_node {
     void update(sensor_msgs__msg__Imu& imu_msg) {
         if (!dmpReady) return;
 
-        uint16_t fifoCount = mpu.getFIFOCount();
+        // read a packet from FIFO
+        if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
 
-        if (fifoCount == 1024) {
-            // reset so we can continue cleanly
-            mpu.resetFIFO();
-            if(debug) printf("FIFO overflow!\n");
-
-        // otherwise, check for DMP data ready interrupt (this should happen frequently)
-        } else if (fifoCount >= 42) {
-
-            // read a packet from FIFO
-            uint8_t fifoBuffer[64]; // FIFO storage buffer
-            mpu.getFIFOBytes(fifoBuffer, packetSize);
+            // Get important data
             mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            mpu.dmpGetAccel(&aa, fifoBuffer);
+            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
 
             imu_msg.orientation.x = q.x;
             imu_msg.orientation.y = q.y;
@@ -188,39 +182,62 @@ class mpu6050_node {
             imu_msg.orientation_covariance[4] = pitch_roll_covariance;
             imu_msg.orientation_covariance[8] = yaw_covariance;
 
-            #ifdef OUTPUT_READABLE_YAWPITCHROLL
-                // display Euler angles in degrees
-                mpu.dmpGetQuaternion(&q, fifoBuffer);
-                mpu.dmpGetGravity(&gravity, &q);
-                mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            // display Euler angles in degrees
+            // Should be in rad/sec.
+            imu_msg.angular_velocity.x = ypr[2];
+            imu_msg.angular_velocity.y = ypr[1];
+            imu_msg.angular_velocity.z = ypr[0];
 
-                // Should be in rad/sec.
-                imu_msg.angular_velocity.x = ypr[2];
-                imu_msg.angular_velocity.y = ypr[1];
-                imu_msg.angular_velocity.z = ypr[0];
+            // display real acceleration, adjusted to remove gravity
+            // https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/MPU6050/MPU6050_6Axis_MotionApps20.h               
 
-            #endif
+            // By default, accel is in arbitrary units with a scale of 16384/1g.
+            // Per http://www.ros.org/reps/rep-0103.html
+            // and http://docs.ros.org/api/sensor_msgs/html/msg/Imu.html
+            // should be in m/s^2.
+            // 1g = 9.80665 m/s^2, so we go arbitrary -> g -> m/s^s
+            imu_msg.linear_acceleration.x = aaReal.x * 1/16384. * 9.80665;
+            imu_msg.linear_acceleration.y = aaReal.y * 1/16384. * 9.80665;
+            imu_msg.linear_acceleration.z = aaReal.z * 1/16384. * 9.80665;
 
-            #ifdef OUTPUT_READABLE_REALACCEL
-                // display real acceleration, adjusted to remove gravity
-                // https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/MPU6050/MPU6050_6Axis_MotionApps20.h
-                mpu.dmpGetQuaternion(&q, fifoBuffer);
-                mpu.dmpGetAccel(&aa, fifoBuffer);
-                mpu.dmpGetGravity(&gravity, &q);
-                mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+            if(debug) {
+                // Print orientation
+                Serial.print("update: \n\torientation = (");
+                Serial.print(q.x);
+                Serial.print(", ");
+                Serial.print(q.y);
+                Serial.print(", ");
+                Serial.print(q.z);
+                Serial.print(", ");
+                Serial.print(q.w);  
+                Serial.print(") \n\ta_vel = (");
 
-                // By default, accel is in arbitrary units with a scale of 16384/1g.
-                // Per http://www.ros.org/reps/rep-0103.html
-                // and http://docs.ros.org/api/sensor_msgs/html/msg/Imu.html
-                // should be in m/s^2.
-                // 1g = 9.80665 m/s^2, so we go arbitrary -> g -> m/s^s
-                imu_msg.linear_acceleration.x = aaReal.x * 1/16384. * 9.80665;
-                imu_msg.linear_acceleration.y = aaReal.y * 1/16384. * 9.80665;
-                imu_msg.linear_acceleration.z = aaReal.z * 1/16384. * 9.80665;
+                // Print YPR
+                Serial.print(ypr[0]);
+                Serial.print(", ");
+                Serial.print(ypr[1]);
+                Serial.print(", ");
+                Serial.print(ypr[2]);  
+                Serial.print(") \n\tl_accel = (");
 
-            #endif
+                // Print acceleration
+                Serial.print(aaReal.x * 1/16384. * 9.80665);
+                Serial.print(", ");
+                Serial.print(aaReal.y * 1/16384. * 9.80665);
+                Serial.print(", ");
+                Serial.print(aaReal.z * 1/16384. * 9.80665);  
+                Serial.print(") \n\n");
 
-            if(debug) printf("update");
+                int16_t AX, AY, AZ, GX, GY, GZ;
+                mpu.getMotion6(&AX, &AY, &AZ, &GX, &GY, &GZ);
+                Serial.print("a/g:\t");
+                Serial.print(AX); Serial.print("\t");
+                Serial.print(AY); Serial.print("\t");
+                Serial.print(AZ); Serial.print("\t");
+                Serial.print(GX); Serial.print("\t");
+                Serial.print(GY); Serial.print("\t");
+                Serial.println(GZ);
+            }
         }
     }
 };
