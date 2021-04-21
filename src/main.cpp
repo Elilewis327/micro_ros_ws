@@ -16,6 +16,7 @@
 #include <rclc/executor.h>
 
 #include "mpu6050_node.h"
+#include "tank_interface.h"
 
 #include <drive_controller_msgs/msg/tank.h>
 #include <drive_controller_msgs/msg/swerve.h>
@@ -26,6 +27,9 @@ unsigned long current_time = 0;
 const unsigned wait_time = 20;
 
 #define LED_PIN 13
+
+#define tankLeftPin 14
+#define tankRightPin 15
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -51,6 +55,7 @@ rcl_timer_t timer;
 
 // I/O
 mpu6050_node imu;
+tankInterface tank(tankLeftPin, tankRightPin);
 
 const unsigned int timer_timeout = 1000;
 
@@ -75,16 +80,20 @@ void imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
 void drive_sub_callback(const void * msgin)
 {  
   const drive_controller_msgs__msg__Tank * drive_msg = (const drive_controller_msgs__msg__Tank *)msgin;
+  tank.update(drive_msg);
 }
 
 void setup() {
   Serial.begin(115200);
   set_microros_transports();
   
+  pinMode(tankLeftPin, OUTPUT);
+  pinMode(tankRightPin, OUTPUT);
+
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);  
   
-  delay(2000);
+  delay(2000);    //time to delay micro_ros agent startup
   Serial.println("Initializing allocator");
   allocator = rcl_get_default_allocator();
   digitalWrite(LED_PIN, LOW);
