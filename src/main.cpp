@@ -44,6 +44,7 @@ void error_loop(){
 
 // Micro Ros declarations
 rcl_subscription_t drive_sub;
+rcl_publisher_t drive_pub;
 rcl_publisher_t imu_pub;
 drive_controller_msgs__msg__Tank drive_msg;
 sensor_msgs__msg__Imu imu_msg;
@@ -56,6 +57,10 @@ rcl_timer_t timer;
 // I/O
 mpu6050_node imu;
 tankInterface tank(tankLeftPin, tankRightPin);
+
+bool on = true;
+unsigned long prevTime = 0;
+const unsigned delta = 200;
 
 const unsigned int timer_timeout = 1000;
 
@@ -80,7 +85,16 @@ void imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
 void drive_sub_callback(const void * msgin)
 {  
   const drive_controller_msgs__msg__Tank * drive_msg = (const drive_controller_msgs__msg__Tank *)msgin;
+  RCSOFTCHECK(rcl_publish(&drive_pub, &drive_msg, NULL));
   tank.update(drive_msg);
+  unsigned long t = millis();
+  
+  digitalWrite(13, on);
+  if (t > prevTime + delta) {
+      prevTime = t;
+      on = !on;
+      digitalWrite(13, on);
+  }
 }
 
 void setup() {
@@ -114,16 +128,31 @@ void setup() {
       "mpu6050_pub"
   ));
 
+  // create publisher
+  RCCHECK(rclc_publisher_init_best_effort(
+      &drive_pub,
+      &node,
+      ROSIDL_GET_MSG_TYPE_SUPPORT(drive_controller_msgs, msg, Tank),
+      "tank_sub"
+  ));
+
   // create subscriber
   Serial.print("Initializing Tank Subscriber");
   RCCHECK(rclc_subscription_init_default(
     &drive_sub,
     &node,
     ROSIDL_GET_MSG_TYPE_SUPPORT(drive_controller_msgs, msg, Tank),
-    "tank_sub"));
+    "tank_pub"));
 
   // Create timer,
   Serial.print("Initializing timer");
+  RCCHECK(rclc_timer_init_default(
+      &timer,
+      &support,
+      RCL_MS_TO_NS(wait_time),
+      imu_timer_callback
+  ));
+
   RCCHECK(rclc_timer_init_default(
       &timer,
       &support,

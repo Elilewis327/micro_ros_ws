@@ -2,6 +2,7 @@
 #include <drive_controller_msgs/msg/tank.h>
 
 class tankInterface{
+      
     public:
         tankInterface(unsigned leftServoPin, unsigned rightServoPin) {
             left_drive.attach(leftServoPin);
@@ -10,8 +11,11 @@ class tankInterface{
         //take message input: -1.0 to 1.0, float
         //write to motor controllers (0-179, map to 53-179)
         void update(const drive_controller_msgs__msg__Tank * msgin) {
-            unsigned left_speed = (unsigned)float_map(msgin->left, -1.0, 1.0, 53, 179);
-            unsigned right_speed = (unsigned)float_map(msgin->right, -1.0, 1.0, 53, 179);
+            printf("L: %.3f R: %.3f", msgin->left, msgin->right);
+            unsigned left_speed = (unsigned)float_map(msgin->left, -1.0, 1.0, 0, 179);
+            unsigned right_speed = (unsigned)float_map(msgin->right, -1.0, 1.0, 0, 179);
+            // analogWrite(13, float_map(left_speed, 0, 179, 0, 255));
+            
             left_drive.write(left_speed);
             right_drive.write(right_speed);
         }
