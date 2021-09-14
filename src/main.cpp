@@ -15,21 +15,12 @@
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 
-#include "mpu6050_node.h"
-#include "tank_interface.h"
-
-#include <drive_controller_msgs/msg/tank.h>
-#include <drive_controller_msgs/msg/swerve.h>
-#include <sensor_msgs/msg/imu.h>
+#include <std_msgs/msg/header.h>
 
 unsigned long previous_time = 0;
-unsigned long current_time = 0;
-const unsigned wait_time = 20;
+const unsigned wait_time = 200;
 
 #define LED_PIN 13
-
-#define tankLeftPin 14
-#define tankRightPin 15
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -42,143 +33,171 @@ void error_loop(){
   }
 }
 
+#define STRING_BUFFER_LEN 50
+
 // Micro Ros declarations
-rcl_subscription_t drive_sub;
-rcl_publisher_t drive_pub;
-rcl_publisher_t imu_pub;
-drive_controller_msgs__msg__Tank drive_msg;
-sensor_msgs__msg__Imu imu_msg;
-rclc_executor_t executor;
-rclc_support_t support;
-rcl_allocator_t allocator;
-rcl_node_t node;
-rcl_timer_t timer;
+rcl_publisher_t ping_publisher;
+rcl_publisher_t pong_publisher;
+rcl_subscription_t ping_subscriber;
+rcl_subscription_t pong_subscriber;
 
-// I/O
-mpu6050_node imu;
-tankInterface tank(tankLeftPin, tankRightPin);
+std_msgs__msg__Header incoming_ping;
+std_msgs__msg__Header outcoming_ping;
+std_msgs__msg__Header incoming_pong;
 
-bool on = true;
-unsigned long prevTime = 0;
-const unsigned delta = 200;
+int device_id;
+int seq_no;
+int pong_count;
 
 const unsigned int timer_timeout = 1000;
 
 extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
 
 // Callbacks
-void imu_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
-    RCLC_UNUSED(last_call_time);
-    if (timer != NULL) {
-        RCSOFTCHECK(rcl_publish(&imu_pub, &imu_msg, NULL));
+void ping_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
+{
+	RCLC_UNUSED(last_call_time);
 
-        // Update header timestamp
-        struct timespec tv = {0};
-        clock_gettime(0, &tv);
-        imu_msg.header.stamp.nanosec = tv.tv_nsec;
-        imu_msg.header.stamp.sec = tv.tv_sec;
-        
-        imu.update(imu_msg);
-    }
+	if (timer != NULL) {
+
+		// seq_no = rand();
+		// sprintf(outcoming_ping.frame_id.data, "%d_%d", seq_no, device_id);
+    //TODO
+    char s[] = "ping";
+		memcpy(outcoming_ping.frame_id.data, s, strlen(s) + 1);
+    outcoming_ping.frame_id.size = strlen(outcoming_ping.frame_id.data);
+
+		// Fill the message timestamp
+		struct timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts);
+		outcoming_ping.stamp.sec = ts.tv_sec;
+		outcoming_ping.stamp.nanosec = ts.tv_nsec;
+
+		// Reset the pong count and publish the ping message
+		// pong_count = 0;
+		rcl_publish(&ping_publisher, (const void*)&outcoming_ping, NULL);
+		// printf("Ping send seq %s\n", outcoming_ping.frame_id.data);
+	}
 }
 
-void drive_sub_callback(const void * msgin)
-{  
-  const drive_controller_msgs__msg__Tank * drive_msg = (const drive_controller_msgs__msg__Tank *)msgin;
-  RCSOFTCHECK(rcl_publish(&drive_pub, &drive_msg, NULL));
-  tank.update(drive_msg);
-  unsigned long t = millis();
+void ping_subscription_callback(const void * msgin)
+{
+	const std_msgs__msg__Header * msg = (const std_msgs__msg__Header *)msgin;
+
+	// Dont pong my own pings
+	// if(strcmp(outcoming_ping.frame_id.data, msg->frame_id.data) != 0){
+
+    char s[] = "pong";
+		memcpy(msg->frame_id.data, s, strlen(s) + 1);
+    msg->frame_id.size = strlen(outcoming_ping.frame_id.data);
+
+		// Fill the message timestamp
+		struct timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts);
+		outcoming_ping.stamp.sec = ts.tv_sec;
+		outcoming_ping.stamp.nanosec = ts.tv_nsec;
+
+		printf("Ping received with seq %s. Answering.\n", msg->frame_id.data);
+		rcl_publish(&pong_publisher, (const void*)msg, NULL);
+    digitalWrite(LED_PIN, !digitalRead(LED_BUILTIN));
+	// }
+}
+
+
+void pong_subscription_callback(const void * msgin)
+{
+	const std_msgs__msg__Header * msg = (const std_msgs__msg__Header *)msgin;
+
+	if(strcmp(outcoming_ping.frame_id.data, msg->frame_id.data) == 0) {
+		pong_count++;
+		printf("Pong for seq %s (%d)\n", msg->frame_id.data, pong_count);
+	}
   
-  digitalWrite(13, on);
-  if (t > prevTime + delta) {
-      prevTime = t;
-      on = !on;
-      digitalWrite(13, on);
-  }
 }
 
 void setup() {
-  Serial.begin(115200);
   set_microros_transports();
-  
-  pinMode(tankLeftPin, OUTPUT);
-  pinMode(tankRightPin, OUTPUT);
 
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);  
-  
+
   delay(2000);    //time to delay micro_ros agent startup
   Serial.println("Initializing allocator");
-  allocator = rcl_get_default_allocator();
   digitalWrite(LED_PIN, LOW);
 
-  // create init_options
-  Serial.print("Initializing default support init");
-  RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+	rclc_support_t support;
 
-  // create node
-  Serial.print("Initializing creating teensy node");
-  RCCHECK(rclc_node_init_default(&node, "teensy_node", "", &support));
+	// create init_options
+	RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 
-  // create publisher
-  RCCHECK(rclc_publisher_init_best_effort(
-      &imu_pub,
-      &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Imu),
-      "mpu6050_pub"
-  ));
+	// create node
+	rcl_node_t node;
+	RCCHECK(rclc_node_init_default(&node, "pingpong_node", "", &support));
 
-  // create publisher
-  RCCHECK(rclc_publisher_init_best_effort(
-      &drive_pub,
-      &node,
-      ROSIDL_GET_MSG_TYPE_SUPPORT(drive_controller_msgs, msg, Tank),
-      "tank_sub"
-  ));
+	// Create a reliable ping publisher
+	RCCHECK(rclc_publisher_init_default(&ping_publisher, &node,
+		ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Header), "/microROS/ping"));
 
-  // create subscriber
-  Serial.print("Initializing Tank Subscriber");
-  RCCHECK(rclc_subscription_init_default(
-    &drive_sub,
-    &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(drive_controller_msgs, msg, Tank),
-    "tank_pub"));
+	// Create a best effort pong publisher
+	RCCHECK(rclc_publisher_init_best_effort(&pong_publisher, &node,
+		ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Header), "/microROS/pong"));
 
-  // Create timer,
-  Serial.print("Initializing timer");
-  RCCHECK(rclc_timer_init_default(
-      &timer,
-      &support,
-      RCL_MS_TO_NS(wait_time),
-      imu_timer_callback
-  ));
+	// Create a best effort ping subscriber
+	RCCHECK(rclc_subscription_init_best_effort(&ping_subscriber, &node,
+		ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Header), "/microROS/ping"));
 
-  RCCHECK(rclc_timer_init_default(
-      &timer,
-      &support,
-      RCL_MS_TO_NS(wait_time),
-      imu_timer_callback
-  ));
+	// Create a best effort  pong subscriber
+	RCCHECK(rclc_subscription_init_best_effort(&pong_subscriber, &node,
+		ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Header), "/microROS/pong"));
 
-  // create executor
-  Serial.print("Initializing executor");
-  RCCHECK(rclc_executor_init(&executor, &support.context, 2, &allocator)); // handles equal to number of topics/subscriptions
-  RCCHECK(rclc_executor_add_subscription(&executor, &drive_sub, &drive_msg, &drive_sub_callback, ON_NEW_DATA));
-  RCCHECK(rclc_executor_add_timer(&executor, &timer));
 
-  // set imu_msg header
-  imu_msg.header.frame_id.data = (char*)malloc(100*sizeof(char));
-  char frame[] = "/IMU";
-  memcpy(imu_msg.header.frame_id.data, frame, strlen(frame) + 1);
-  imu_msg.header.frame_id.size = strlen(imu_msg.header.frame_id.data);
-  imu_msg.header.frame_id.capacity = 100;
+	// Create a 3 seconds ping timer timer,
+	rcl_timer_t timer;
+	RCCHECK(rclc_timer_init_default(&timer, &support, RCL_MS_TO_NS(400), ping_timer_callback));
+
+
+	// Create executor
+	rclc_executor_t executor;
+	RCCHECK(rclc_executor_init(&executor, &support.context, 2, &allocator));
+	RCCHECK(rclc_executor_add_timer(&executor, &timer));
+	RCCHECK(rclc_executor_add_subscription(&executor, &ping_subscriber, &incoming_ping,
+		&ping_subscription_callback, ON_NEW_DATA));
+	// RCCHECK(rclc_executor_add_subscription(&executor, &pong_subscriber, &incoming_pong,
+	// 	&pong_subscription_callback, ON_NEW_DATA));
+
+	// Create and allocate the pingpong messages
+	char outcoming_ping_buffer[STRING_BUFFER_LEN];
+	outcoming_ping.frame_id.data = outcoming_ping_buffer;
+	outcoming_ping.frame_id.capacity = STRING_BUFFER_LEN;
+
+	char incoming_ping_buffer[STRING_BUFFER_LEN];
+	incoming_ping.frame_id.data = incoming_ping_buffer;
+	incoming_ping.frame_id.capacity = STRING_BUFFER_LEN;
+
+	char incoming_pong_buffer[STRING_BUFFER_LEN];
+	incoming_pong.frame_id.data = incoming_pong_buffer;
+	incoming_pong.frame_id.capacity = STRING_BUFFER_LEN;
+
+	device_id = rand();
+
+	while(1){
+		unsigned long t = millis();
+    if (t > previous_time + wait_time) {
+      rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1));
+      previous_time = t;
+      
+    }
+	}
+
+	// Free resources
+	RCCHECK(rcl_publisher_fini(&ping_publisher, &node));
+	RCCHECK(rcl_publisher_fini(&pong_publisher, &node));
+	RCCHECK(rcl_subscription_fini(&ping_subscriber, &node));
+	RCCHECK(rcl_subscription_fini(&pong_subscriber, &node));
+	RCCHECK(rcl_node_fini(&node));
 }
 
 void loop() {
-  current_time = millis();
-  if(current_time - previous_time > wait_time){
-    RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
-    
-    previous_time = current_time;
-  }
+  
 }
