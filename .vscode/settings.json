@@ -36,6 +36,11 @@
         "utility": "cpp",
         "typeinfo": "cpp",
         "ctime": "cpp",
-        "*.in": "cpp"
+        "*.in": "cpp",
+        "string": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "climits": "cpp",
+        "cstdbool": "cpp"
     }
 }
