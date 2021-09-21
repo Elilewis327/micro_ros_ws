@@ -7,10 +7,8 @@
 #include <rcl/error_handling.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
-#include <std_msgs/msg/header.h>
-// #include <drive_controller_msgs/msg/tank.h>
-
-static std_msgs__msg__Header msg;
+// #include <std_msgs/msg/header.h>
+#include <drive_controller_msgs/msg/tank.h>
 
 #define LED_PIN 13
 
@@ -27,11 +25,11 @@ void error_loop(){
 
 void subscription_callback(const void * msgin)
 {  
-//   const drive_controller_msgs__msg__Tank * msg1 = (const drive_controller_msgs__msg__Tank *)msgin;
-	const std_msgs__msg__Header * msg1 = (const std_msgs__msg__Header *)msgin;
-//   Serial1.printf("%s: (%f,%f)\n", msg1->header.frame_id.data, msg1->left, msg1->right);
-	Serial1.printf("%s: (%f,%f)\n", msg1->frame_id.data, msg1->stamp.sec, msg1->stamp.nanosec);
-	Serial1.printf("%s: (%f,%f)\n", msg.frame_id.data, msg.stamp.sec, msg.stamp.nanosec);
+  const drive_controller_msgs__msg__Tank * msg1 = (const drive_controller_msgs__msg__Tank *)msgin;
+	// const std_msgs__msg__Header * msg1 = (const std_msgs__msg__Header *)msgin;
+  Serial1.printf("%s[%d,%d]: (%f,%f)\n", msg1->header.frame_id.data, msg1->header.stamp.sec, msg1->header.stamp.nanosec, msg1->left, msg1->right);
+	// Serial1.printf("%s: (%d,%d)\n", msg1->frame_id.data, msg1->stamp.sec, msg1->stamp.nanosec);
+	// Serial1.printf("%s: (%d,%d)\n", msg.frame_id.data, msg.stamp.sec, msg.stamp.nanosec);
   digitalWrite(LED_PIN, !digitalRead(LED_PIN));  
 }
 
@@ -41,7 +39,7 @@ void setup() {
 	
 	rclc_executor_t executor;
 	rclc_support_t support;
-	
+	drive_controller_msgs__msg__Tank msg;
 	rcl_node_t node;
 	Serial1.begin(9600);
   set_microros_transports();
@@ -63,8 +61,8 @@ void setup() {
   RCCHECK(rclc_subscription_init_default(
     &subscriber,
     &node,
-    // ROSIDL_GET_MSG_TYPE_SUPPORT(drive_controller_msgs, msg, Tank),
-    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Header),
+    ROSIDL_GET_MSG_TYPE_SUPPORT(drive_controller_msgs, msg, Tank),
+    // ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Header),
 	"micro_ros_arduino_subscriber"));
 
   // create executor
@@ -72,13 +70,13 @@ void setup() {
   RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &msg, &subscription_callback, ON_NEW_DATA));
 
 	// Assigning dynamic memory to the frame_id char sequence
-	msg.frame_id.capacity = 100;
-	msg.frame_id.data = (char*) malloc(msg.frame_id.capacity * sizeof(char));
-	msg.frame_id.size = 0;
+	msg.header.frame_id.capacity = 100;
+	msg.header.frame_id.data = (char*) malloc(msg.header.frame_id.capacity * sizeof(char));
+	msg.header.frame_id.size = 0;
 
 	// Assigning value to the frame_id char sequence
-	strcpy(msg.frame_id.data, "Hello World");
-	msg.frame_id.size = strlen(msg.frame_id.data);
+	strcpy(msg.header.frame_id.data, "Hello World");
+	msg.header.frame_id.size = strlen(msg.header.frame_id.data);
 
 	while (1) {
 		delay(100);
