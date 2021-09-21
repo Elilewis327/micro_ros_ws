@@ -21,7 +21,7 @@ extern "C"
 // Member 'measurement_source_name'
 // Member 'metrics_source'
 // Member 'unit'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'window_start'
 // Member 'window_stop'
 #include "builtin_interfaces/msg/detail/time__struct.h"

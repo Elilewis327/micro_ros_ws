@@ -199,7 +199,7 @@ enum
 
 // Include directives for member types
 // Member 'label'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in msg/Transition in the package lifecycle_msgs.
 typedef struct lifecycle_msgs__msg__Transition

@@ -25,7 +25,7 @@ enum
 
 // Include directives for member types
 // Member 'prefixes'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/ListParameters in the package rcl_interfaces.
 typedef struct rcl_interfaces__srv__ListParameters_Request

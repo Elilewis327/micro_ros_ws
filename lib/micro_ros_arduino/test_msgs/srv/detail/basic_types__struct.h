@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'string_value'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/BasicTypes in the package test_msgs.
 typedef struct test_msgs__srv__BasicTypes_Request
@@ -56,7 +56,7 @@ typedef struct test_msgs__srv__BasicTypes_Request__Sequence
 // Include directives for member types
 // Member 'string_value'
 // already included above
-// #include "rosidl_runtime_c/libstring.h"
+// #include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/BasicTypes in the package test_msgs.
 typedef struct test_msgs__srv__BasicTypes_Response

@@ -32,7 +32,7 @@ enum
 // Include directives for member types
 // Member 'server_id'
 // Member 'erases'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'markers'
 #include "visualization_msgs/msg/detail/interactive_marker__struct.h"
 // Member 'poses'

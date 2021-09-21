@@ -18,17 +18,24 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif
+#endif // ifdef __cplusplus
 
+#include <uxr/client/config.h>
 #include <uxr/client/core/session/stream/reliable_stream.h>
 #include <uxr/client/core/session/stream/seq_num.h>
+
+#ifdef UCLIENT_PROFILE_MULTITHREAD
+#include <uxr/client/profile/multithread/multithread.h>
+#endif // ifdef UCLIENT_PROFILE_MULTITHREAD
 
 #include <stdbool.h>
 
 struct ucdrBuffer;
 struct uxrOutputReliableStream;
 
-typedef void (*OnNewFragment)(struct ucdrBuffer* ub, struct uxrOutputReliableStream* stream);
+typedef void (* OnNewFragment)(
+        struct ucdrBuffer* ub,
+        struct uxrOutputReliableStream* stream);
 
 typedef struct uxrOutputReliableStream
 {
@@ -43,10 +50,14 @@ typedef struct uxrOutputReliableStream
     uint8_t next_heartbeat_tries;
     bool send_lost;
 
+#ifdef UCLIENT_PROFILE_MULTITHREAD
+    uxrMutex mutex;
+#endif // ifdef UCLIENT_PROFILE_MULTITHREAD
+
 } uxrOutputReliableStream;
 
 #ifdef __cplusplus
 }
-#endif
+#endif // ifdef __cplusplus
 
 #endif // UXR__CLIENT__CORE__SESSION__STREAM__OUTPUT_RELIABLE_STREAM_H_

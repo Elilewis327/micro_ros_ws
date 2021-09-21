@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @file
+ */
+
 #ifndef UXR_CLIENT_UTIL_PING_H_
 #define UXR_CLIENT_UTIL_PING_H_
 
 #ifdef __cplusplus
 extern "C"
 {
-#endif
+#endif // ifdef __cplusplus
 
 #include <uxr/client/visibility.h>
 #include <uxr/client/transport.h>
@@ -36,13 +40,14 @@ extern "C"
  *          This methods performs a single attempt.
  *          Transport must be properly initialized before calling this method.
  *          This method does not take care of init/fini the transport struct.
+ * @ingroup      general_utils
  * @param   comm Pointer to the uxrCommunication struct holding the transport
  *               information and callback methods.
  * @param   timeout Time, in milliseconds, for a ping attempt.
  * @return `true` in case of a successful ping to the agent, `false` otherwise.
  */
 UXRDLLAPI bool uxr_ping_agent(
-        const uxrCommunication* comm,
+        uxrCommunication* comm,
         const int timeout);
 
 /**
@@ -52,6 +57,7 @@ UXRDLLAPI bool uxr_ping_agent(
  *          successful ping occurs.
  *          Transport must be properly initialized before calling this method.
  *          This method does not take care of init/fini the transport struct.
+ * @ingroup     general_utils
  * @param   comm Pointer to the uxrCommunication struct holding the transport
  *               information and callback methods.
  * @param   timeout Time, in milliseconds, for a ping attempt.
@@ -59,13 +65,13 @@ UXRDLLAPI bool uxr_ping_agent(
  * @return `true` in case of a successful ping to the agent, `false` otherwise.
  */
 UXRDLLAPI bool uxr_ping_agent_attempts(
-        const uxrCommunication* comm,
+        uxrCommunication* comm,
         const int timeout,
         const uint8_t attempts);
 
 
 #ifdef __cplusplus
 }
-#endif
+#endif // ifdef __cplusplus
 
 #endif // UXR_CLIENT_UTIL_PING_H_

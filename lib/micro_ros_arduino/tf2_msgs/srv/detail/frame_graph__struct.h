@@ -38,7 +38,7 @@ typedef struct tf2_msgs__srv__FrameGraph_Request__Sequence
 
 // Include directives for member types
 // Member 'frame_yaml'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/FrameGraph in the package tf2_msgs.
 typedef struct tf2_msgs__srv__FrameGraph_Response

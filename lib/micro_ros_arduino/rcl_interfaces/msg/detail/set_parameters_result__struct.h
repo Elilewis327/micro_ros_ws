@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'reason'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in msg/SetParametersResult in the package rcl_interfaces.
 typedef struct rcl_interfaces__msg__SetParametersResult

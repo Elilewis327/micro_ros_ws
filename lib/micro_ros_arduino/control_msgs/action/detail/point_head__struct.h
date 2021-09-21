@@ -23,7 +23,7 @@ extern "C"
 // Member 'pointing_axis'
 #include "geometry_msgs/msg/detail/vector3__struct.h"
 // Member 'pointing_frame'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'min_duration'
 #include "builtin_interfaces/msg/detail/duration__struct.h"
 

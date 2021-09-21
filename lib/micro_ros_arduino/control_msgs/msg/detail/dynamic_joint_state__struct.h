@@ -21,7 +21,7 @@ extern "C"
 // Member 'header'
 #include "std_msgs/msg/detail/header__struct.h"
 // Member 'joint_names'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'interface_values'
 #include "control_msgs/msg/detail/interface_value__struct.h"
 

@@ -38,7 +38,7 @@ enum
 // Include directives for member types
 // Member 'title'
 // Member 'command'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in msg/MenuEntry in the package visualization_msgs.
 typedef struct visualization_msgs__msg__MenuEntry

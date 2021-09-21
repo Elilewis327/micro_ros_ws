@@ -18,15 +18,29 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif
+#endif // ifdef __cplusplus
+
+#include <uxr/client/config.h>
 
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef bool (*send_msg_func)(void* instance, const uint8_t* buf, size_t len);
-typedef bool (*recv_msg_func)(void* instance, uint8_t** buf, size_t* len, int timeout);
-typedef uint8_t (*comm_error_func)(void);
+#ifdef UCLIENT_PROFILE_MULTITHREAD
+#include <uxr/client/profile/multithread/multithread.h>
+#endif // ifdef UCLIENT_PROFILE_MULTITHREAD
+
+typedef bool (* send_msg_func)(
+        void* instance,
+        const uint8_t* buf,
+        size_t len);
+typedef bool (* recv_msg_func)(
+        void* instance,
+        uint8_t** buf,
+        size_t* len,
+        int timeout);
+typedef uint8_t (* comm_error_func)(
+        void);
 
 typedef struct uxrCommunication
 {
@@ -36,10 +50,14 @@ typedef struct uxrCommunication
     comm_error_func comm_error;
     uint16_t mtu;
 
+#ifdef UCLIENT_PROFILE_MULTITHREAD
+    uxrMutex mutex;
+#endif // ifdef UCLIENT_PROFILE_MULTITHREAD
+
 } uxrCommunication;
 
 #ifdef __cplusplus
 }
-#endif
+#endif // ifdef __cplusplus
 
 #endif //_UXR_CLIENT_CORE_COMMUNICATION_COMMUNICATION_H_

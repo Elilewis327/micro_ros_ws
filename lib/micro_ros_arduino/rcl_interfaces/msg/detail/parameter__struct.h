@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'name'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'value'
 #include "rcl_interfaces/msg/detail/parameter_value__struct.h"
 

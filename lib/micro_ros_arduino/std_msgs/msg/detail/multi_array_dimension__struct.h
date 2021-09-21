@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'label'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in msg/MultiArrayDimension in the package std_msgs.
 typedef struct std_msgs__msg__MultiArrayDimension

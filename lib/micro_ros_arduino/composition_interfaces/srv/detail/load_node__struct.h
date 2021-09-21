@@ -23,7 +23,7 @@ extern "C"
 // Member 'node_name'
 // Member 'node_namespace'
 // Member 'remap_rules'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'parameters'
 // Member 'extra_arguments'
 #include "rcl_interfaces/msg/detail/parameter__struct.h"
@@ -58,7 +58,7 @@ typedef struct composition_interfaces__srv__LoadNode_Request__Sequence
 // Member 'error_message'
 // Member 'full_node_name'
 // already included above
-// #include "rosidl_runtime_c/libstring.h"
+// #include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/LoadNode in the package composition_interfaces.
 typedef struct composition_interfaces__srv__LoadNode_Response
