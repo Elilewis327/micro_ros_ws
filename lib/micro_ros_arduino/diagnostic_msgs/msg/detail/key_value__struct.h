@@ -20,7 +20,7 @@ extern "C"
 // Include directives for member types
 // Member 'key'
 // Member 'value'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in msg/KeyValue in the package diagnostic_msgs.
 typedef struct diagnostic_msgs__msg__KeyValue

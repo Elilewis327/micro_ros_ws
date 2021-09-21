@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'names'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/DescribeParameters in the package rcl_interfaces.
 typedef struct rcl_interfaces__srv__DescribeParameters_Request

@@ -63,7 +63,7 @@ enum
 // Member 'header'
 #include "std_msgs/msg/detail/header__struct.h"
 // Member 'ns'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'position'
 // Member 'points'
 #include "geometry_msgs/msg/detail/point__struct.h"

@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @file
+ */
+
 #ifndef UXR_CLIENT_CORE_SESSION_READ_ACCESS_H_
 #define UXR_CLIENT_CORE_SESSION_READ_ACCESS_H_
 
 #ifdef __cplusplus
 extern "C"
 {
-#endif
+#endif // ifdef __cplusplus
 
 #include <uxr/client/core/session/session.h>
 
@@ -26,19 +30,32 @@ extern "C"
 #define UXR_MAX_ELAPSED_TIME_UNLIMITED      0x0000
 #define UXR_MAX_BYTES_PER_SECOND_UNLIMITED  0x0000
 
-
-/**
- * @brief A structure used for controlling the delivery of topic from the Agent to the Client.
+/** \addtogroup read Read access
+ *  The Read Access is used by the Client to handle the read operation on the Agent. The declaration of these functions can be found in uxr/client/profile/session/read_access.h.
+ *  @{
  */
+
+/** @struct uxrDeliveryControl
+ *  @brief A structure used for controlling the delivery of topic from the Agent to the Client.
+ *
+ *  @var uxrDeliveryControl::max_samples
+ *  The maximum number of topics that the Agent shall send to the Client.
+ *
+ *  @var uxrDeliveryControl::max_elapsed_time
+ *  The maximum amount of time in seconds that shall be spent by the Agent delivering the topic.
+ *
+ *  @var uxrDeliveryControl::max_bytes_per_second
+ *  The maximum transfer rate, in bytes per second, that the Agent shall use.
+ *
+ *  @var uxrDeliveryControl::min_pace_period
+ *  The minimum elapsed time, in milliseconds, between two topics deliveries.
+ */
+
 typedef struct uxrDeliveryControl
 {
-    /** The maximum number of topics that the Agent shall send to the Client. */
     uint16_t max_samples;
-    /** The maximum amount of time in seconds that shall be spent by the Agent delivering the topic. */
     uint16_t max_elapsed_time;
-    /** The maximum transfer rate, in bytes per second, that the Agent shall use. */
     uint16_t max_bytes_per_second;
-    /** The minimum elapsed time, in milliseconds, between two topics deliveries. */
     uint16_t min_pace_period;
 
 } uxrDeliveryControl;
@@ -68,7 +85,7 @@ UXRDLLAPI uint16_t uxr_buffer_request_data(
         uxrStreamId stream_id,
         uxrObjectId datareader_id,
         uxrStreamId data_stream_id,
-        const uxrDeliveryControl * const delivery_control);
+        const uxrDeliveryControl* const delivery_control);
 
 /**
  * @brief Buffers into the stream identified by `stream_id` an XRCE READ_DATA submessage.
@@ -85,8 +102,10 @@ UXRDLLAPI uint16_t uxr_buffer_cancel_data(
         uxrStreamId stream_id,
         uxrObjectId datareader_id);
 
+/** @}*/
+
 #ifdef __cplusplus
 }
-#endif
+#endif // ifdef __cplusplus
 
 #endif // UXR_CLIENT_CORE_SESSION_READ_ACCESS_H_

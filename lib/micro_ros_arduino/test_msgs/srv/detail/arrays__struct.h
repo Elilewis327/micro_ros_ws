@@ -20,7 +20,7 @@ extern "C"
 // Include directives for member types
 // Member 'string_values'
 // Member 'string_values_default'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'basic_types_values'
 #include "test_msgs/msg/detail/basic_types__struct.h"
 // Member 'constants_values'
@@ -81,7 +81,7 @@ typedef struct test_msgs__srv__Arrays_Request__Sequence
 // Member 'string_values'
 // Member 'string_values_default'
 // already included above
-// #include "rosidl_runtime_c/libstring.h"
+// #include "rosidl_runtime_c/string.h"
 // Member 'basic_types_values'
 // already included above
 // #include "test_msgs/msg/detail/basic_types__struct.h"

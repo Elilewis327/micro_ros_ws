@@ -44,7 +44,7 @@ extern "C"
  * Use RCUTILS_LOG_MIN_SEVERITY_NONE to compile out all macros.
  */
 #ifndef RCUTILS_LOG_MIN_SEVERITY
-#define RCUTILS_LOG_MIN_SEVERITY RCUTILS_LOG_MIN_SEVERITY_DEBUG
+#define RCUTILS_LOG_MIN_SEVERITY RCUTILS_LOG_MIN_SEVERITY_NONE
 #endif
 
 // TODO(dhood): optimise severity check via notifyLoggerLevelsChanged concept or similar.
@@ -65,7 +65,7 @@ extern "C"
  */
 #define RCUTILS_LOG_COND_NAMED(severity, condition_before, condition_after, name, ...) \
   do { \
-    RCUTILS_LOGGING_AUTOINIT \
+    RCUTILS_LOGGING_AUTOINIT; \
     static rcutils_log_location_t __rcutils_logging_location = {__func__, __FILE__, __LINE__}; \
     if (rcutils_logging_logger_is_enabled_for(name, severity)) { \
       condition_before \
