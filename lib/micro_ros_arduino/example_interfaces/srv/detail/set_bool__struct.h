@@ -38,7 +38,7 @@ typedef struct example_interfaces__srv__SetBool_Request__Sequence
 
 // Include directives for member types
 // Member 'message'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/SetBool in the package example_interfaces.
 typedef struct example_interfaces__srv__SetBool_Response

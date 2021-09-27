@@ -38,7 +38,7 @@ typedef struct std_srvs__srv__Trigger_Request__Sequence
 
 // Include directives for member types
 // Member 'message'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/Trigger in the package std_srvs.
 typedef struct std_srvs__srv__Trigger_Response
