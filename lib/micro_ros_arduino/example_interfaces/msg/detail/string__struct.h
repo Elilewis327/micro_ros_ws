@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'data'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/String in the package example_interfaces.
 typedef struct example_interfaces__msg__String

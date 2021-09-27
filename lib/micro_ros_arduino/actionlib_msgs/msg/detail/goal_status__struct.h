@@ -81,7 +81,7 @@ enum
 // Member 'goal_id'
 #include "actionlib_msgs/msg/detail/goal_id__struct.h"
 // Member 'text'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/GoalStatus in the package actionlib_msgs.
 typedef struct actionlib_msgs__msg__GoalStatus

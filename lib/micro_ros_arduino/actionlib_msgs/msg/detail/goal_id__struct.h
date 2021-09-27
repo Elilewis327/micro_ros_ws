@@ -21,7 +21,7 @@ extern "C"
 // Member 'stamp'
 #include "builtin_interfaces/msg/detail/time__struct.h"
 // Member 'id'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/GoalID in the package actionlib_msgs.
 typedef struct actionlib_msgs__msg__GoalID
