@@ -28,8 +28,8 @@ void subscription_callback(const void * msgin)
   const drive_controller_msgs__msg__Tank * msg1 = (const drive_controller_msgs__msg__Tank *)msgin;
 	// const std_msgs__msg__Header * msg1 = (const std_msgs__msg__Header *)msgin;
   Serial1.printf("%s[%d,%d]: (%f,%f)\n", msg1->header.frame_id.data, msg1->header.stamp.sec, msg1->header.stamp.nanosec, msg1->left, msg1->right);
-	// Serial1.printf("%s: (%d,%d)\n", msg1->frame_id.data, msg1->stamp.sec, msg1->stamp.nanosec);
-	// Serial1.printf("%s: (%d,%d)\n", msg.frame_id.data, msg.stamp.sec, msg.stamp.nanosec);
+	Serial1.println(msg1->left);
+	Serial1.println(msg1->right);
   digitalWrite(LED_PIN, !digitalRead(LED_PIN));  
 }
 

@@ -25,8 +25,8 @@ extern "C"
 typedef struct drive_controller_msgs__msg__Tank
 {
   std_msgs__msg__Header header;
-  float left;
-  float right;
+  double left;
+  double right;
 } drive_controller_msgs__msg__Tank;
 
 // Struct for a sequence of drive_controller_msgs__msg__Tank.
