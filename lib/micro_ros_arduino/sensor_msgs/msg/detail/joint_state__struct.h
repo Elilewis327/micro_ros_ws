@@ -21,7 +21,7 @@ extern "C"
 // Member 'header'
 #include "std_msgs/msg/detail/header__struct.h"
 // Member 'name'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'position'
 // Member 'velocity'
 // Member 'effort'

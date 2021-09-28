@@ -54,7 +54,7 @@ enum
 // Member 'msg'
 // Member 'file'
 // Member 'function'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/Log in the package rcl_interfaces.
 typedef struct rcl_interfaces__msg__Log

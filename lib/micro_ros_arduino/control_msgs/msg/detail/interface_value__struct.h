@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'interface_names'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'values'
 #include "rosidl_runtime_c/primitives_sequence.h"
 

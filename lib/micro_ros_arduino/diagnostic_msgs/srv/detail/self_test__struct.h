@@ -38,7 +38,7 @@ typedef struct diagnostic_msgs__srv__SelfTest_Request__Sequence
 
 // Include directives for member types
 // Member 'id'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'status'
 #include "diagnostic_msgs/msg/detail/diagnostic_status__struct.h"
 

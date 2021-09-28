@@ -21,7 +21,7 @@ extern "C"
 // Member 'header'
 #include "std_msgs/msg/detail/header__struct.h"
 // Member 'child_frame_id'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'transform'
 #include "geometry_msgs/msg/detail/transform__struct.h"
 

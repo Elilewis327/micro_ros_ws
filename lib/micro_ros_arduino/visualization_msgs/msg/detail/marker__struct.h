@@ -119,7 +119,7 @@ enum
 // Member 'ns'
 // Member 'text'
 // Member 'mesh_resource'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'pose'
 #include "geometry_msgs/msg/detail/pose__struct.h"
 // Member 'scale'

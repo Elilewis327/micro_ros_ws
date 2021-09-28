@@ -17,7 +17,7 @@
 
 #include <stddef.h>
 
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 #include "rosidl_runtime_c/visibility_control.h"
 
 #ifdef __cplusplus

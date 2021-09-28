@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'name'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/JointTolerance in the package control_msgs.
 typedef struct control_msgs__msg__JointTolerance

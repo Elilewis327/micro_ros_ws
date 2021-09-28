@@ -12,64 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @file
- */
-
 #ifndef UXR_CLIENT_CORE_SESSION_SESSION_H_
 #define UXR_CLIENT_CORE_SESSION_SESSION_H_
 
 #ifdef __cplusplus
 extern "C"
 {
-#endif // ifdef __cplusplus
+#endif
 
-#include <uxr/client/config.h>
 #include <uxr/client/core/session/session_info.h>
 #include <uxr/client/core/session/stream/stream_storage.h>
 #include <uxr/client/core/type/xrce_types.h>
-
-#ifdef UCLIENT_PROFILE_MULTITHREAD
-#include <uxr/client/profile/multithread/multithread.h>
-#endif // ifdef UCLIENT_PROFILE_MULTITHREAD
 
 #define UXR_TIMEOUT_INF       -1
 
 struct uxrSession;
 struct uxrCommunication;
 
-/** \addtogroup session Session
- *  These functions are available even if no profile has been enabled. The declaration of these functions can be found in uxr/client/core/session/session.h.
- *  @{
- */
-
-
-/**
- * @brief Function signature used for on_status_func callbacks.
- * @param session	Session structure related to the status.
- * @param object_id	The identifier of the entity related to the status.
- * @param request_id    Status request id.
- * @param status	Status value.
- * @param args		User pointer data.
- */
-typedef void (* uxrOnStatusFunc) (
+typedef void (*uxrOnStatusFunc) (
         struct uxrSession* session,
         uxrObjectId object_id,
         uint16_t request_id,
         uint8_t status,
         void* args);
 
-/**
- * @brief Function signature used for on_topic_func callbacks.
- * @param session	    Session structure related to the topic.
- * @param object_id	    The identifier of the entity related to the topic.
- * @param request_id    Request id of the``request_data`` transaction.
- * @param stream_id     Id of the stream used for the communication.
- * @param ub            Serialized topic data.
- * @param length        Length of the serialized data.
- * @param args		    User pointer data.
- */
-typedef void (* uxrOnTopicFunc) (
+typedef void (*uxrOnTopicFunc) (
         struct uxrSession* session,
         uxrObjectId object_id,
         uint16_t request_id,
@@ -78,16 +45,7 @@ typedef void (* uxrOnTopicFunc) (
         uint16_t length,
         void* args);
 
-/**
- * @brief Function signature used for on_time_func callbacks.
- * @param session	            Session structure related to the topic.
- * @param current_timestamp     Client’s timestamp of the response packet reception.
- * @param transmit_timestamp    Client’s timestamp of the request packet transmission.
- * @param received_timestamp    Agent’s timestamp of the request packet reception.
- * @param originate_timestamp   Agent’s timestamp of the response packet transmission.
- * @param args		            User pointer data.
- */
-typedef void (* uxrOnTimeFunc) (
+typedef void (*uxrOnTimeFunc) (
         struct uxrSession* session,
         int64_t current_timestamp,
         int64_t transmit_timestamp,
@@ -95,17 +53,7 @@ typedef void (* uxrOnTimeFunc) (
         int64_t originate_timestamp,
         void* args);
 
-/**
- * @brief Function signature used for on_request_func callbacks.
- * @param session	    Session structure related to the topic.
- * @param object_id	    The identifier of the entity related to the request.
- * @param request_id    Request id of the``request_data`` transaction.
- * @param sample_id     Identifier of the request.
- * @param ub            Serialized request data.
- * @param length        Length of the serialized data.
- * @param args		    User pointer data.
- */
-typedef void (* uxrOnRequestFunc) (
+typedef void (*uxrOnRequestFunc) (
         struct uxrSession* session,
         uxrObjectId object_id,
         uint16_t request_id,
@@ -114,17 +62,7 @@ typedef void (* uxrOnRequestFunc) (
         uint16_t length,
         void* args);
 
-/**
- * @brief Sets the reply callback, which is called when the Agent sends a READ_DATA submessage associated with a Replier.
- * @param session       Session structure related to the topic.
- * @param object_id     The identifier of the entity related to the request.
- * @param request_id    Request id of the``request_data`` transaction.
- * @param reply_id      Identifier of the reply.
- * @param ub            Serialized request data.
- * @param length        Length of the serialized data.
- * @param args		    User pointer data.
- */
-typedef void (* uxrOnReplyFunc) (
+typedef void (*uxrOnReplyFunc) (
         struct uxrSession* session,
         uxrObjectId object_id,
         uint16_t request_id,
@@ -133,38 +71,19 @@ typedef void (* uxrOnReplyFunc) (
         uint16_t length,
         void* args);
 
-/**
- * @brief Function signature used for flush_callback callbacks.
- * @param session   Session structure related to the buffer to be flushed.
- */
-typedef bool (* uxrOnBuffersFull) (
-        struct uxrSession* session,
-        void* args);
+typedef bool (*uxrOnBuffersFull) (
+        struct uxrSession* session);
 
 #ifdef PERFORMANCE_TESTING
-/**
- * @nosubgrouping
- */
-typedef void (* uxrOnPerformanceFunc) (
-        struct uxrSession* session,
-        struct ucdrBuffer* mb,
-        void* args);
-#endif // ifdef PERFORMANCE_TESTING
+typedef void (*uxrOnPerformanceFunc) (struct uxrSession* session, struct ucdrBuffer* mb, void* args);
+#endif
 
-/**
- * @nosubgrouping
- */
-typedef struct uxrContinuousArgs
-{
+typedef struct uxrContinuousArgs {
     uxrOnBuffersFull flush_callback;
-    void* flush_callback_args;
     uxrStreamId stream_id;
     size_t data_size;
 } uxrContinuousArgs;
 
-/**
- * @nosubgrouping
- */
 typedef struct uxrSession
 {
     uxrSessionInfo info;
@@ -195,14 +114,10 @@ typedef struct uxrSession
     bool on_data_flag;
     uxrContinuousArgs continuous_args;
 
-#ifdef UCLIENT_PROFILE_MULTITHREAD
-    uxrMutex mutex;
-#endif // ifdef UCLIENT_PROFILE_MULTITHREAD
-
 #ifdef PERFORMANCE_TESTING
     uxrOnPerformanceFunc on_performance;
     void* on_performance_args;
-#endif // ifdef PERFORMANCE_TESTING
+#endif
 } uxrSession;
 
 /**
@@ -260,7 +175,7 @@ UXRDLLAPI void uxr_set_time_callback(
  * @brief Sets the request callback.
  *        It will be called when a request is received from the Agent.
  *        The requests will be received only if a `request_data` function has been called with a `Requester` object id.
- *
+ * 
  * @param session               A uxrSession structure previously initialized.
  * @param on_request_func       The function that will be called when a valid request message arrives from the Agent.
  * @param args                  User pointer data. The args will be provided to the `on_request_func` callback.
@@ -274,10 +189,11 @@ UXRDLLAPI void uxr_set_request_callback(
  * @brief Sets the reply callback.
  *        It will be called when a reply is received from the Agent.
  *        The reply will be received only if a `request_data` function has been called with a `Replier` object id.
- *
+ * 
  * @param session               A uxrSession structure previosly initialized.
  * @param on_reply_func         The function that will be called when a valid reply message arrives from the Agent.
  * @param args                  User pointer data. The args will be provided to the `on_reply_func` callback.
+ * @return UXRDLLAPI uxr_set_reply_callback 
  */
 UXRDLLAPI void uxr_set_reply_callback(
         uxrSession* session,
@@ -285,14 +201,8 @@ UXRDLLAPI void uxr_set_reply_callback(
         void* args);
 
 #ifdef PERFORMANCE_TESTING
-/**
- * @nosubgrouping
- */
-UXRDLLAPI void uxr_set_performance_callback(
-        uxrSession* session,
-        uxrOnPerformanceFunc on_performance_func,
-        void* args);
-#endif // ifdef PERFORMANCE_TESTING
+UXRDLLAPI void uxr_set_performance_callback(uxrSession* session, uxrOnPerformanceFunc on_performance_func, void* args);
+#endif
 
 /**
  * @brief Creates a new session with the Agent.
@@ -300,8 +210,7 @@ UXRDLLAPI void uxr_set_performance_callback(
  * @param session   A uxrSesssion structure previously initialized.
  * @return  true in case of successful session establishment, and false in other case.
  */
-UXRDLLAPI bool uxr_create_session(
-        uxrSession* session);
+UXRDLLAPI bool uxr_create_session(uxrSession* session);
 
 /**
  * @brief Creates a new session with the Agent.
@@ -310,9 +219,7 @@ UXRDLLAPI bool uxr_create_session(
  * @param retries   Max attempts for creating the session.
  * @return  true in case of successful session establishment, and false in other case.
  */
-UXRDLLAPI bool uxr_create_session_retries(
-        uxrSession* session,
-        size_t retries);
+UXRDLLAPI bool uxr_create_session_retries(uxrSession* session, size_t retries);
 
 /**
  * @brief Deletes a session previously created.
@@ -321,8 +228,7 @@ UXRDLLAPI bool uxr_create_session_retries(
  * @param session   A uxrSession structure previously initialized.
  * @return  true in case of successful session deletion, and false in other case.
  */
-UXRDLLAPI bool uxr_delete_session(
-        uxrSession* session);
+UXRDLLAPI bool uxr_delete_session(uxrSession* session);
 
 /**
  * @brief Deletes a session previously created.
@@ -332,9 +238,7 @@ UXRDLLAPI bool uxr_delete_session(
  * @param retries   Max attempts for deleting the session.
  * @return  true in case of successful session deletion, and false in other case.
  */
-UXRDLLAPI bool uxr_delete_session_retries(
-        uxrSession* session,
-        size_t retries);
+UXRDLLAPI bool uxr_delete_session_retries(uxrSession* session, size_t retries);
 
 /**
  * @brief Creates and initializes an output best-effort stream.
@@ -372,8 +276,7 @@ UXRDLLAPI uxrStreamId uxr_create_output_reliable_stream(
  * @param session   A uxrSession structure previously initialized.
  * @return  A uxrStreamId which could by used for managing the stream.
  */
-UXRDLLAPI uxrStreamId uxr_create_input_best_effort_stream(
-        uxrSession* session);
+UXRDLLAPI uxrStreamId uxr_create_input_best_effort_stream(uxrSession* session);
 
 /**
  * @brief Creates and initializes an input reliable stream.
@@ -396,28 +299,27 @@ UXRDLLAPI uxrStreamId uxr_create_input_reliable_stream(
  * @brief Flashes all the output streams seding the data through the transport.
  * @param session   A uxrSession structure previously initialized.
  */
-UXRDLLAPI void uxr_flash_output_streams(
-        uxrSession* session);
+UXRDLLAPI void uxr_flash_output_streams(uxrSession* session);
 
 /**
  * @brief  Keeps communication between the Client and the Agent.
  *         This function involves the following actions:
- *          1. flushing all the output streams sending the data through the transport,
+ *          1. flashing all the output streams sending the data through the transport,
  *          2. listening messages from the Agent calling the associated callback (topic and status).
  *        The aforementioned actions will be performed in a loop until the waiting time for a new message
- *        exceeds the `timeout`.
+ *        exceeds the `time`.
  * @param session   A uxrSession structure previously initialized.
- * @param timeout   The waiting time in milliseconds.
+ * @param time      The waiting time in milliseconds.
  * @return  `true` in case of the Agent confirms the reception of all the output messages. `false` in other case.
  */
 UXRDLLAPI bool uxr_run_session_time(
         uxrSession* session,
-        int timeout);
+        int time);
 
 /**
  * @brief  Keeps communication between the Client and the Agent.
  *         This function involves the following actions:
- *          1. flushing all the output streams sending the data through the transport,
+ *          1. flashing all the output streams sending the data through the transport,
  *          2. listening messages from the Agent calling the associated callback (topic and status).
  *        The aforementioned actions will be performed in a loop until the `timeout` is exceeded.
  * @param session   A uxrSession structure previously initialized.
@@ -431,9 +333,9 @@ UXRDLLAPI bool uxr_run_session_timeout(
 /**
  * @brief  Keeps communication between the Client and the Agent.
  *         This function involves the following actions:
- *          1. flushing all the output streams sending the data through the transport,
+ *          1. flashing all the output streams sending the data through the transport,
  *          2. listening messages from the Agent calling the associated callback (topic, status, request and replies).
- *        The aforementioned actions will be performed in a loop until a data message is received
+ *        The aforementioned actions will be performed in a loop until a data message is received 
  *        or the `timeout` is exceeded.
  * @param session   A uxrSession structure previously initialized.
  * @param timeout   The waiting time in milliseconds.
@@ -446,7 +348,7 @@ UXRDLLAPI bool uxr_run_session_until_data(
 /**
  * @brief  Keeps communication between the Client and the Agent.
  *         This function involves the following actions:
- *          1. flushing all the output streams sending the data through the transport,
+ *          1. flashing all the output streams sending the data through the transport,
  *          2. listening messages from the Agent calling the associated callback (topic and status).
  *        The aforementioned actions will be performed in a loop until a message is received
  *        or the `timeout` is exceeded.
@@ -461,7 +363,7 @@ UXRDLLAPI bool uxr_run_session_until_timeout(
 /**
  * @brief  Keeps communication between the Client and the Agent.
  *         This function involves the following actions:
- *          1. flushing all the output streams sending the data through the transport,
+ *          1. flashing all the output streams sending the data through the transport,
  *          2. listening messages from the Agent calling the associated callback (topic and status).
  *        The aforementioned actions will be performed in a loop until a the `timeout` is exceeded
  *        or the output reliable streams confirm the delivery of all their messages.
@@ -476,7 +378,7 @@ UXRDLLAPI bool uxr_run_session_until_confirm_delivery(
 /**
  * @brief  Keeps communication between the Client and the Agent.
  *         This function involves the following actions:
- *          1. flushing all the output streams sending the data through the transport,
+ *          1. flashing all the output streams sending the data through the transport,
  *          2. listening messages from the Agent calling the associated callback (topic and status).
  *        The aforementioned actions will be performed in a loop until a the `timeout` is exceeded
  *        or all the requested status are received.
@@ -498,7 +400,7 @@ UXRDLLAPI bool uxr_run_session_until_all_status(
 /**
  * @brief  Keeps communication between the Client and the Agent.
  *         This function involves the following actions:
- *          1. flushing all the output streams sending the data through the transport,
+ *          1. flashing all the output streams sending the data through the transport,
  *          2. listening messages from the Agent calling the associated callback (topic and status).
  *        The aforementioned actions will be performed in a loop until a the `timeout` is exceeded
  *        or one of the requested status is received.
@@ -533,34 +435,26 @@ UXRDLLAPI bool uxr_sync_session(
  * @param session   A uxrSession structure previosly initialized.
  * @return The epoch time in milliseconds.
  */
-UXRDLLAPI int64_t uxr_epoch_millis(
-        uxrSession* session);
+UXRDLLAPI int64_t uxr_epoch_millis(uxrSession* session);
 
 /**
  * @brief Returns the epoch time in nanoseconds taking into account the offset computed during the time synchronization.
  * @param session   A uxrSession structure previosly initialized.
  * @return The epoch time in nanoseconds.
  */
-UXRDLLAPI int64_t uxr_epoch_nanos(
-        uxrSession* session);
+UXRDLLAPI int64_t uxr_epoch_nanos(uxrSession* session);
 
 #ifdef PERFORMANCE_TESTING
-/**
- * @nosubgrouping
- */
-UXRDLLAPI bool uxr_buffer_performance(
-        uxrSession* session,
-        uxrStreamId stream_id,
-        uint64_t epoch_time,
-        uint8_t* buf,
-        uint16_t len,
-        bool echo);
-#endif // ifdef PERFORMANCE_TESTING
-
-/** @}*/
+UXRDLLAPI bool uxr_buffer_performance(uxrSession* session,
+                                      uxrStreamId stream_id,
+                                      uint64_t epoch_time,
+                                      uint8_t* buf,
+                                      uint16_t len,
+                                      bool echo);
+#endif
 
 #ifdef __cplusplus
 }
-#endif // ifdef __cplusplus
+#endif
 
 #endif // UXR_CLIENT_CORE_SESSION_SESSION_H

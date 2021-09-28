@@ -43,7 +43,7 @@ typedef struct control_msgs__srv__QueryTrajectoryState_Request__Sequence
 // Include directives for member types
 // Member 'message'
 // Member 'name'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'position'
 // Member 'velocity'
 // Member 'acceleration'

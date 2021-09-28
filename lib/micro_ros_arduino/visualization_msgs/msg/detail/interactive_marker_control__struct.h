@@ -98,7 +98,7 @@ enum
 // Include directives for member types
 // Member 'name'
 // Member 'description'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'orientation'
 #include "geometry_msgs/msg/detail/quaternion__struct.h"
 // Member 'markers'

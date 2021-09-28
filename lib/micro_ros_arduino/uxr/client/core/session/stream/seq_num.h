@@ -18,7 +18,7 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif // ifdef __cplusplus
+#endif
 
 #include <stdint.h>
 
@@ -26,6 +26,6 @@ typedef uint16_t uxrSeqNum;
 
 #ifdef __cplusplus
 }
-#endif // ifdef __cplusplus
+#endif
 
 #endif // _UXR_CLIENT_CORE_SESSION_STREAM_SEQ_NUM_H_

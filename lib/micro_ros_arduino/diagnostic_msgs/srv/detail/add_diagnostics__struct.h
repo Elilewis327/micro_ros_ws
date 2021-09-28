@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'load_namespace'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in srv/AddDiagnostics in the package diagnostic_msgs.
 typedef struct diagnostic_msgs__srv__AddDiagnostics_Request
@@ -43,7 +43,7 @@ typedef struct diagnostic_msgs__srv__AddDiagnostics_Request__Sequence
 // Include directives for member types
 // Member 'message'
 // already included above
-// #include "rosidl_runtime_c/string.h"
+// #include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in srv/AddDiagnostics in the package diagnostic_msgs.
 typedef struct diagnostic_msgs__srv__AddDiagnostics_Response

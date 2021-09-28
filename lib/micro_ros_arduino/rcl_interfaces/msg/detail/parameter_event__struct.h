@@ -21,7 +21,7 @@ extern "C"
 // Member 'stamp'
 #include "builtin_interfaces/msg/detail/time__struct.h"
 // Member 'node'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'new_parameters'
 // Member 'changed_parameters'
 // Member 'deleted_parameters'

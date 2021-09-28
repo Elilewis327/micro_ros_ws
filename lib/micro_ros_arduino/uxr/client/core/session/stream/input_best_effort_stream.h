@@ -18,14 +18,9 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif // ifdef __cplusplus
+#endif
 
-#include <uxr/client/config.h>
 #include <uxr/client/core/session/stream/seq_num.h>
-
-#ifdef UCLIENT_PROFILE_MULTITHREAD
-#include <uxr/client/profile/multithread/multithread.h>
-#endif // ifdef UCLIENT_PROFILE_MULTITHREAD
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -34,14 +29,10 @@ typedef struct uxrInputBestEffortStream
 {
     uxrSeqNum last_handled;
 
-#ifdef UCLIENT_PROFILE_MULTITHREAD
-    uxrMutex mutex;
-#endif // ifdef UCLIENT_PROFILE_MULTITHREAD
-
 } uxrInputBestEffortStream;
 
 #ifdef __cplusplus
 }
-#endif // ifdef __cplusplus
+#endif
 
 #endif // _UXR_CLIENT_CORE_SESSION_STREAM_INPUT_BEST_EFFORT_STREAM_H_

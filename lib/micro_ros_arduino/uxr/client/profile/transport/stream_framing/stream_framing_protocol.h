@@ -17,7 +17,7 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif // ifdef __cplusplus
+#endif
 
 #include <stdint.h>
 
@@ -57,6 +57,6 @@ typedef struct uxrFramingIO
 
 #ifdef __cplusplus
 }
-#endif // ifdef __cplusplus
+#endif
 
 #endif //_UXR_CLIENT_PROFILE_TRANSPORT_STREAM_FRAMING_PROTOCOL_H_

@@ -24,7 +24,7 @@ extern "C"
 #include "geometry_msgs/msg/detail/pose__struct.h"
 // Member 'name'
 // Member 'description'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'menu_entries'
 #include "visualization_msgs/msg/detail/menu_entry__struct.h"
 // Member 'controls'

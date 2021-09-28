@@ -22,7 +22,6 @@ extern "C"
 #endif
 
 #include <rcl/rcl.h>
-#include <rclc/visibility_control.h>
 
 /// TODO (jst3si) Where is this defined? - in my build environment this variable is not set.
 // #define ROS_PACKAGE_NAME "rclc"
@@ -31,17 +30,10 @@ extern "C"
 typedef enum
 {
   SUBSCRIPTION,
-  SUBSCRIPTION_WITH_CONTEXT,
   TIMER,
-  // TIMER_WITH_CONTEXT,  // TODO
   CLIENT,
-  CLIENT_WITH_REQUEST_ID,
-  // CLIENT_WITH_CONTEXT,  // TODO
   SERVICE,
-  SERVICE_WITH_REQUEST_ID,
-  SERVICE_WITH_CONTEXT,
   GUARD_CONDITION,
-  // GUARD_CONDITION_WITH_CONTEXT,  //TODO
   NONE
 } rclc_executor_handle_type_t;
 
@@ -53,18 +45,17 @@ typedef enum
   ALWAYS
 } rclc_executor_handle_invocation_t;
 
-/// Type definition for subscription callback function
-/// - incoming message
-typedef void (* rclc_subscription_callback_t)(const void *);
+typedef enum
+{
+  CB_UNDEFINED,
+  CB_WITHOUT_REQUEST_ID,
+  CB_WITH_REQUEST_ID,
+  CB_WITH_CONTEXT,
+} rclc_executor_handle_callback_type_t;
 
-/// Type definition (duplicate) for subscription callback function (alias for foxy and galactic).
-/// - incoming message
-typedef rclc_subscription_callback_t rclc_callback_t;
 
-/// Type definition for subscription callback function
-/// - incoming message
-/// - additional callback context
-typedef void (* rclc_subscription_callback_with_context_t)(const void *, void *);
+/// Type definition for callback function.
+typedef void (* rclc_callback_t)(const void *);
 
 /// Type definition for client callback function
 /// - request message
@@ -122,8 +113,8 @@ typedef struct
   /// only for service - ptr to response message
   void * data_response_msg;
 
-  /// ptr to additional callback context
-  void * callback_context;
+  /// only for service - ptr to additional service context
+  void * service_context;
 
   // TODO(jst3si) new type to be stored as data for
   //              service/client objects
@@ -136,8 +127,7 @@ typedef struct
 
   /// Storage for callbacks
   union {
-    rclc_subscription_callback_t subscription_callback;
-    rclc_subscription_callback_with_context_t subscription_callback_with_context;
+    rclc_callback_t callback;
     rclc_service_callback_t service_callback;
     rclc_service_callback_with_request_id_t service_callback_with_reqid;
     rclc_service_callback_with_context_t service_callback_with_context;
@@ -158,6 +148,8 @@ typedef struct
   /// Interval variable. Flag, which is true, if new data is available from DDS queue
   /// (is set after calling rcl_take)
   bool data_available;
+  /// callback type for service/client
+  rclc_executor_handle_callback_type_t callback_type;
 } rclc_executor_handle_t;
 
 /// Information about total number of subscriptions, guard_conditions, timers, subscription etc.
@@ -191,7 +183,6 @@ typedef struct
  * \param[inout] handle_counters preallocated rclc_executor_handle_counters_t
  * \return `RCL_RET_INVALID_ARGUMENT` if `handle_counters` is a null pointer
  */
-RCLC_PUBLIC
 rcl_ret_t
 rclc_executor_handle_counters_zero_init(rclc_executor_handle_counters_t * handle_counters);
 
@@ -215,7 +206,6 @@ rclc_executor_handle_counters_zero_init(rclc_executor_handle_counters_t * handle
  * \return `RCL_RET_OK` if the \p handle was initialized successfully
  * \return `RCL_RET_INVALID_ARGUMENT` if \p h is a null pointer
  */
-RCLC_PUBLIC
 rcl_ret_t
 rclc_executor_handle_init(
   rclc_executor_handle_t * handle,
@@ -239,7 +229,6 @@ rclc_executor_handle_init(
  * \return `RCL_RET_OK` if \p h was cleared successfully
  * \return `RCL_RET_INVALID_ARGUMENT` if \p h is a null pointer
  */
-RCLC_PUBLIC
 rcl_ret_t
 rclc_executor_handle_clear(
   rclc_executor_handle_t * handle,
@@ -260,7 +249,6 @@ rclc_executor_handle_clear(
  * \return `RCL_RET_OK` if the handle was printed successfully
  * \return `RCL_RET_INVALID_ARGUMENT` if \p h is a null pointer
  */
-RCLC_PUBLIC
 rcl_ret_t
 rclc_executor_handle_print(rclc_executor_handle_t * handle);
 
@@ -282,7 +270,6 @@ rclc_executor_handle_print(rclc_executor_handle_t * handle);
  * \return pointer to the rcl-handle (rcl_subscription_t or rcl_timer_t)
  * \return NULL, if handle is a NULL pointer.
  */
-RCLC_PUBLIC
 void *
 rclc_executor_handle_get_ptr(rclc_executor_handle_t * handle);
 

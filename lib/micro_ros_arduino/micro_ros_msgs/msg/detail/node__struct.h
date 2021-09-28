@@ -20,7 +20,7 @@ extern "C"
 // Include directives for member types
 // Member 'node_namespace'
 // Member 'node_name'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'entities'
 #include "micro_ros_msgs/msg/detail/entity__struct.h"
 

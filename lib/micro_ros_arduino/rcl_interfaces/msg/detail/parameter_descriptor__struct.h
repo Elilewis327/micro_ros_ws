@@ -21,7 +21,7 @@ extern "C"
 // Member 'name'
 // Member 'description'
 // Member 'additional_constraints'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 // Member 'floating_point_range'
 #include "rcl_interfaces/msg/detail/floating_point_range__struct.h"
 // Member 'integer_range'
@@ -47,7 +47,6 @@ typedef struct rcl_interfaces__msg__ParameterDescriptor
   rosidl_runtime_c__String description;
   rosidl_runtime_c__String additional_constraints;
   bool read_only;
-  bool dynamic_typing;
   rcl_interfaces__msg__FloatingPointRange__Sequence floating_point_range;
   rcl_interfaces__msg__IntegerRange__Sequence integer_range;
 } rcl_interfaces__msg__ParameterDescriptor;

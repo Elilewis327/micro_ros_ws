@@ -21,7 +21,7 @@ extern "C"
 // Member 'stamp'
 #include "builtin_interfaces/msg/detail/time__struct.h"
 // Member 'frame_id'
-#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/libstring.h"
 
 // Struct defined in msg/Header in the package std_msgs.
 typedef struct std_msgs__msg__Header
