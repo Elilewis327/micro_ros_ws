@@ -8,10 +8,10 @@
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 
-#include <std_msgs/msg/float32.h>
+#include <std_msgs/msg/float64.h>
 
 rcl_subscription_t subscriber;
-std_msgs__msg__Float32 msg;
+std_msgs__msg__Float64 msg;
 rclc_executor_t executor;
 rclc_support_t support;
 rcl_allocator_t allocator;
@@ -33,7 +33,7 @@ void error_loop(){
 
 void subscription_callback(const void * msgin)
 {  
-  const std_msgs__msg__Float32 * msg = (const std_msgs__msg__Float32 *)msgin;
+  const std_msgs__msg__Float64 * msg = (const std_msgs__msg__Float64 *)msgin;
   digitalWrite(LED_PIN, !digitalRead(LED_PIN));  
   Serial1.printf("Data: %f\n", msg->data);
 }
@@ -59,7 +59,7 @@ void setup() {
   RCCHECK(rclc_subscription_init_default(
     &subscriber,
     &node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float64),
     "micro_ros_arduino_subscriber"));
 
   // create executor
