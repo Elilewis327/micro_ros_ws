@@ -38,7 +38,7 @@ typedef struct composition_interfaces__srv__ListNodes_Request__Sequence
 
 // Include directives for member types
 // Member 'full_node_names'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'unique_ids'
 #include "rosidl_runtime_c/primitives_sequence.h"
 

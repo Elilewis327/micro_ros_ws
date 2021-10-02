@@ -67,7 +67,7 @@ enum
 
 // Include directives for member types
 // Member 'name'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in msg/PointField in the package sensor_msgs.
 typedef struct sensor_msgs__msg__PointField

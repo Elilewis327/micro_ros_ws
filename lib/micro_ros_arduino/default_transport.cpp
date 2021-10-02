@@ -18,17 +18,14 @@ extern "C"
   {
     (void)unused;
     static uint32_t rollover = 0;
-    static uint64_t last_measure = 0;
+    static uint32_t last_measure = 0;
 
-    uint64_t m = micros();
-    tp->tv_sec = m / 1000000;
-    tp->tv_nsec = (m % 1000000) * 1000;
-
-    // Rollover handling
+    uint32_t m = micros();
     rollover += (m < last_measure) ? 1 : 0;
-    uint64_t rollover_extra_us = rollover * micro_rollover_useconds;
-    tp->tv_sec += rollover_extra_us / 1000000;
-    tp->tv_nsec += (rollover_extra_us % 1000000) * 1000;
+
+    uint64_t real_us = (uint64_t) (m + rollover * micro_rollover_useconds);
+    tp->tv_sec = real_us / 1000000;
+    tp->tv_nsec = (real_us % 1000000) * 1000;
     last_measure = m;
 
     return 0;
@@ -60,3 +57,14 @@ extern "C"
     return Serial.readBytes((char *)buf, len);
   }
 }
+
+// ---- Build fixes -----
+
+// TODO: This should be fixed
+#if defined(ARDUINO_TEENSY31) || defined(ARDUINO_TEENSY32) || defined(ARDUINO_TEENSY35) || defined(ARDUINO_TEENSY36)
+
+extern "C" void _write(){
+}
+
+#endif
+// ----------------------

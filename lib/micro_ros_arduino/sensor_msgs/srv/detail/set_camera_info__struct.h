@@ -42,7 +42,7 @@ typedef struct sensor_msgs__srv__SetCameraInfo_Request__Sequence
 
 // Include directives for member types
 // Member 'status_message'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/SetCameraInfo in the package sensor_msgs.
 typedef struct sensor_msgs__srv__SetCameraInfo_Response

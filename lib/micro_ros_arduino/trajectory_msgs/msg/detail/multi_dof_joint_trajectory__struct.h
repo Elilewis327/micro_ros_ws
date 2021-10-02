@@ -21,7 +21,7 @@ extern "C"
 // Member 'header'
 #include "std_msgs/msg/detail/header__struct.h"
 // Member 'joint_names'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'points'
 #include "trajectory_msgs/msg/detail/multi_dof_joint_trajectory_point__struct.h"
 

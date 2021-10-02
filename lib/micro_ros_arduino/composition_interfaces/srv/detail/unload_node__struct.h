@@ -38,7 +38,7 @@ typedef struct composition_interfaces__srv__UnloadNode_Request__Sequence
 
 // Include directives for member types
 // Member 'error_message'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in srv/UnloadNode in the package composition_interfaces.
 typedef struct composition_interfaces__srv__UnloadNode_Response

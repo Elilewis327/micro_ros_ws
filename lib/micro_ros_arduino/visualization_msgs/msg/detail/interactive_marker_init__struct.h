@@ -19,7 +19,7 @@ extern "C"
 
 // Include directives for member types
 // Member 'server_id'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'markers'
 #include "visualization_msgs/msg/detail/interactive_marker__struct.h"
 

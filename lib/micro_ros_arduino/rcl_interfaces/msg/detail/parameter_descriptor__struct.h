@@ -21,7 +21,7 @@ extern "C"
 // Member 'name'
 // Member 'description'
 // Member 'additional_constraints'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'floating_point_range'
 #include "rcl_interfaces/msg/detail/floating_point_range__struct.h"
 // Member 'integer_range'

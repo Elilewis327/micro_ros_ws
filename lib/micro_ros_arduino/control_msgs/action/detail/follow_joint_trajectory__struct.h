@@ -86,7 +86,7 @@ enum
 
 // Include directives for member types
 // Member 'error_string'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 
 // Struct defined in action/FollowJointTrajectory in the package control_msgs.
 typedef struct control_msgs__action__FollowJointTrajectory_Result
@@ -113,7 +113,7 @@ typedef struct control_msgs__action__FollowJointTrajectory_Result__Sequence
 #include "std_msgs/msg/detail/header__struct.h"
 // Member 'joint_names'
 // already included above
-// #include "rosidl_runtime_c/libstring.h"
+// #include "rosidl_runtime_c/string.h"
 // Member 'desired'
 // Member 'actual'
 // Member 'error'

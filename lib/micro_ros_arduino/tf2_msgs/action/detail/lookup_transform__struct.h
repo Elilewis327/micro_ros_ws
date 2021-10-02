@@ -21,7 +21,7 @@ extern "C"
 // Member 'target_frame'
 // Member 'source_frame'
 // Member 'fixed_frame'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'source_time'
 // Member 'target_time'
 #include "builtin_interfaces/msg/detail/time__struct.h"

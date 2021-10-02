@@ -20,7 +20,7 @@ extern "C"
 // Include directives for member types
 // Member 'string_value'
 // Member 'string_array_value'
-#include "rosidl_runtime_c/libstring.h"
+#include "rosidl_runtime_c/string.h"
 // Member 'byte_array_value'
 // Member 'bool_array_value'
 // Member 'integer_array_value'

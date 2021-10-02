@@ -73,10 +73,6 @@ void setup() {
 	msg.header.frame_id.data = (char*) malloc(msg.header.frame_id.capacity * sizeof(char));
 	msg.header.frame_id.size = 0;
 
-	// Assigning value to the frame_id char sequence
-	strcpy(msg.header.frame_id.data, "Hello World");
-	msg.header.frame_id.size = strlen(msg.header.frame_id.data);
-
 	while (1) {
 		delay(100);
   		RCCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
